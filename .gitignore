@@ -1,0 +1,20 @@
+# Learner data and browser profiles must never be published.
+.chrome*/
+*browser-profile*/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+!.env.example
+*backup*.json
+*recovery*.json
+storage-state*.json
+# Historical/generated local artifacts, not shipped by serve.py.
+archive/
+lesson-content.js
+eval-scenarios.json
+/*.png
+/tests/*.png
+.venv/
+_site/

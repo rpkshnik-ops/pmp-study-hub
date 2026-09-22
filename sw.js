@@ -1,6 +1,6 @@
 'use strict';
-const CACHE = 'pmp-study-hub-16d5887a2b73ac7b';
-const ASSETS = ['./','./index.html','./styles.css','./config.js','./core.js','./app.js','./icon.svg','./manifest.webmanifest', ...[1,2,3,4,5,6].map(n=>'./content/pack-'+String(n).padStart(2,'0')+'.json')];
+const CACHE = 'pmp-study-hub-8eb4e77142716234';
+const ASSETS = ['./','./index.html','./styles.css','./config.js','./core.js','./learning.js','./app.js','./icon.svg','./manifest.webmanifest', ...[1,2,3,4,5,6].map(n=>'./content/pack-'+String(n).padStart(2,'0')+'.json')];
 self.addEventListener('install', event => event.waitUntil((async () => {
  const cache=await caches.open(CACHE);await cache.addAll(ASSETS);
  // v1/v2 had no update UI. Activate this one-time bridge; do not reload any client.

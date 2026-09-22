@@ -59,6 +59,7 @@ def run():
         page.on('request',lambda r:external.append(r.url) if not r.url.startswith(url) else None)
         page.goto(url,wait_until='networkidle')
         page.locator('#profileForm button').click()
+        assert 'step=read' in page.get_by_role('link',name='Есть 10–15 минут',exact=True).get_attribute('href')
         page.get_by_role('link',name='Начать занятие',exact=True).click()
         page.get_by_role('heading',name=CONTENT[0]['title'],exact=True).wait_for()
         assert len(page.locator('.lesson-nav a').all())==6
@@ -90,6 +91,21 @@ def run():
         page.locator('[data-action=complete]').click()
         assert 'L01' in get_state(page)['completedLessons']
         assert len(get_state(page)['reviews'])>=2
+        # A completed lesson does not skip the rest of its weekly practice.
+        page.goto(url+'/#week?id=L01&task=recall')
+        page.locator('[data-action=complete-week]').click()
+        assert 'Запишите результат' in page.locator('#weekFeedback').inner_text()
+        page.locator('textarea').fill('Объяснил принцип своими словами, привёл контрпример и исправил допущение после сверки.')
+        page.locator('select[data-work]').select_option('yes')
+        page.locator('[data-action=complete-week]').click()
+        page.reload(wait_until='networkidle')
+        assert 'Объяснил принцип' in page.locator('textarea').input_value()
+        assert any(k.endswith('recall-done') for k in get_state(page)['lessonWork']['L01']['fields'])
+        with page.expect_download() as week_download:page.locator('[data-action=export-week]').click()
+        assert 'Объяснил принцип' in Path(week_download.value.path()).read_text(encoding='utf-8')
+        page.goto(url+'/#progress')
+        assert page.get_by_role('heading',name='Что получается и что повторить').is_visible()
+        assert page.locator('tbody tr').count()==24
         # Real numeric control, not a radio button disguised as a numeric question.
         numeric=next(q for q in BANK.values() if q['type']=='numeric')
         lesson=next(l for l in CONTENT if any(q['id']==numeric['id'] for q in l['questions']))
@@ -158,7 +174,7 @@ def run():
         assert 'Offline ответ' in page.locator('textarea').first.input_value()
         # Phone: navigation, keyboard controls and all important pages fit the viewport.
         page.set_viewport_size({'width':390,'height':844})
-        for route in ['today','route','lessons','lesson?id=L08','lesson?id=L01&step=artifact','practice','review','exams','experience','settings']:
+        for route in ['today','route','week?id=L01','progress','lessons','lesson?id=L08','lesson?id=L01&step=artifact','practice','review','exams','experience','settings']:
             page.goto(url+'/#'+route)
             page.wait_for_timeout(50)
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+1'),route
@@ -190,6 +206,48 @@ def run():
         assert 'L01' in get_state(again)['completedLessons']
         assert (again.request.get(url+'/archive/v1/app.js')).status==404
         assert (again.request.get(url+'/.chrome-test/')).status==404
+        # New weekly workflow: a narrow first block does not require the whole lesson.
+        features=browser.new_context();fp=features.new_page();fp.on('pageerror',lambda e:errors.append(str(e)))
+        fp.goto(url,wait_until='networkidle');fp.locator('#profileForm button').click()
+        fp.goto(url+'/#lesson?id=L01&step=recall');fill_work(fp,'Своя формулировка')
+        fp.goto(url+'/#week?id=L01&task=lesson');fp.locator('textarea').fill('Выделил понятия и исправил неточную формулировку после сверки с примером.')
+        fp.locator('select[data-work]').select_option('yes');fp.locator('[data-action=complete-week]').click()
+        assert get_state(fp)['completedLessons']==[]
+        assert any(k.endswith('lesson-done') for k in get_state(fp)['lessonWork']['L01']['fields'])
+        fp.goto(url+'/#route');fp.locator('[data-mode=practice]').click()
+        fp.goto(url+'/#week');fp.locator('#weekSelect').select_option('L08')
+        for task in ['recall','transfer','apply','review']:
+            fp.goto(url+'/#week?id=L08&task='+task)
+            fp.locator('textarea').fill('Выполнил задачу, проверил допущения по рубрике и записал оставшиеся вопросы.')
+            fp.locator('select[data-work]').select_option('yes');fp.locator('[data-action=complete-week]').click()
+        fp.goto(url+'/#today')
+        assert fp.get_by_role('link',name='Начать занятие',exact=True).get_attribute('href')=='#progress'
+        # Help remains attached across new sessions; timed feedback is deferred.
+        fp.goto(url+'/#practice');fp.locator('[data-action=start-practice][data-id=L01]').click()
+        fp.locator('#questionHint summary').click()
+        fp.wait_for_function('(key)=>JSON.parse(localStorage.getItem(key)).exposures.some(x=>x.helpAt)',arg=KEY)
+        fp.goto(url+'/#practice');fp.locator('[data-action=start-practice][data-id=L01]').click()
+        answer(fp,CONTENT[0]['questions'][0]);a=get_state(fp)['attempts'][-1]
+        assert a['assisted'] and a['priorExposure']
+        fp.goto(url+'/#exams');fp.locator('[data-action=timed]').click()
+        timed_q=BANK[get_state(fp)['sessions']['quiz']['questionIds'][0]]
+        answer(fp,timed_q)
+        assert 'объяснения откроются после завершения' in fp.locator('.feedback').inner_text()
+        assert 'Верный ответ:' not in fp.locator('#main').inner_text()
+        # Five daily reviews return to the plan, while extra reviews remain optional.
+        first_cards=[c['id'] for l in CONTENT for c in l['cards']][:7]
+        fp.evaluate('(args)=>{const s=JSON.parse(localStorage.getItem(args.key));s.reviews=Object.fromEntries(args.ids.map(id=>[id,{dueAt:"2020-01-01",intervalDays:1}]));localStorage.setItem(args.key,JSON.stringify(s));}',{'key':KEY,'ids':first_cards})
+        fp.reload();fp.goto(url+'/#review')
+        for _ in range(5):
+            fp.locator('[data-action=show-card]').click();fp.locator('[data-action=rate-card][data-rating="3"]').click()
+        assert fp.get_by_role('heading',name='Порция на сегодня выполнена').is_visible()
+        fp.locator('[data-action=more-reviews]').click();assert fp.locator('[data-action=show-card]').is_visible()
+        fp.set_viewport_size({'width':390,'height':844});fp.goto(url+'/#week?id=L08')
+        fp.screenshot(path=str(ROOT/'tests'/'week-mobile.png'),full_page=True)
+        fp.set_viewport_size({'width':1280,'height':900});fp.goto(url+'/#progress')
+        fp.screenshot(path=str(ROOT/'tests'/'progress-desktop.png'),full_page=True)
+        assert not errors,errors
+        features.close()
         # Corrupt save: preserve original and restore through the recovery UI.
         damaged=browser.new_context();broken=damaged.new_page();broken.goto(url,wait_until='networkidle')
         broken.evaluate('(key)=>localStorage.setItem(key,"{broken")',KEY)

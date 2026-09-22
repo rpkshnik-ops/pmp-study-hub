@@ -16,7 +16,7 @@ test('migrate the real unversioned v1 shape, preserve name, notes and timestamps
 });
 test('import validation rejects nested malformed records, prototype pollution and unsupported versions',()=>{
  const state=C.createState();
- for(const change of [s=>s.profile.hours='5',s=>s.lessonWork.L01={fields:[],revealed:[]},s=>s.journal=[{note:3,at:'now'}],s=>s.experience=[{title:'x',start:'2026-14',end:'2026-15'}],s=>s.reviews.c={dueAt:'no',intervalDays:1},s=>s.sessions.quiz={index:'NaN'},s=>s.attempts=[{...attempt(question()),correct:'false'}]]){
+ for(const change of [s=>s.profile.hours='5',s=>s.lessonWork.L01={fields:[],revealed:[]},s=>s.journal=[{note:3,at:'now'}],s=>s.experience=[{title:'x',start:'2026-14',end:'2026-15'}],s=>s.reviews.c={dueAt:'no',intervalDays:1},s=>s.sessions.quiz={index:'NaN'},s=>s.attempts=[{...attempt(question()),correct:'false'}],s=>s.attempts=[attempt(question(),{priorExposure:'true'})]]){
   const bad=structuredClone(state);change(bad);assert.throws(()=>C.parseImport(JSON.stringify({schemaVersion:2,state:bad})));
  }
  assert.throws(()=>C.parseImport('{"schemaVersion":2,"state":{"__proto__":{"polluted":true}}}'));
@@ -38,8 +38,33 @@ test('merge is idempotent and preserves current profile and current draft',()=>{
  assert.deepEqual(C.mergeState(merged,b),merged);
 });
 test('snapshots are detached from updated question keys and repeat attempts remain separate',()=>{
- const q=question(),s=C.createState();s.attempts=[attempt(q),attempt(q,{id:'b',answer:[0],correct:false})];const store=memory();C.save(store,s);q.correct[0]=0;
- const restored=C.load(store).state;assert.equal(restored.attempts.length,2);assert.deepEqual(restored.attempts[0].questionSnapshot.correct,[1]);
+ const q=question(),s=C.createState();s.attempts=[attempt(q,{priorExposure:true}),attempt(q,{id:'b',answer:[0],correct:false})];const store=memory();C.save(store,s);q.correct[0]=0;
+ const restored=C.load(store).state;assert.equal(restored.attempts.length,2);assert.deepEqual(restored.attempts[0].questionSnapshot.correct,[1]);assert.equal(restored.attempts[0].priorExposure,true);assert.equal(restored.attempts[1].priorExposure,false);
+});
+
+function quizSession(q, extra={}){
+ const snapshot={...q,principle:'Use the agreed process.',hint:'Review the next step.'};
+ return {id:'session-1',kind:'lesson',lessonId:'L01',questionIds:[q.id],questionSnapshots:{[q.id]:snapshot},index:0,startedAt:'2026-09-18T12:00:00Z',deadline:'',draftAnswers:{[q.id]:[1]},confidence:{[q.id]:0},assisted:{[q.id]:false},started:{[q.id]:'2026-09-18T12:00:01Z'},responseIds:[],finished:false,...extra};
+}
+test('imports legacy v2 active sessions without snapshots and validates saved sessions identically',()=>{
+ const q=question(),state=C.createState();state.sessions.quiz=quizSession(q);delete state.sessions.quiz.questionSnapshots;
+ const restored=C.parseImport(JSON.stringify({schemaVersion:2,state}));assert.equal(restored.sessions.quiz.questionSnapshots,undefined);
+ const saved=quizSession(q);saved.previouslySeen={[q.id]:true};state.sessions.saved={[saved.id]:saved};assert.equal(C.parseImport(JSON.stringify({schemaVersion:2,state})).sessions.saved[saved.id].confidence[q.id],0);
+ const legacyPractice=quizSession(q,{kind:'practice'});state.sessions.saved={[legacyPractice.id]:legacyPractice};assert.equal(C.parseImport(JSON.stringify({schemaVersion:2,state})).sessions.saved[legacyPractice.id].kind,'practice');
+});
+test('quiz session import rejects duplicate IDs, malformed drafts and unsafe snapshots in active or saved sessions',()=>{
+ const q=question(),state=C.createState(),base=()=>quizSession(q);
+ for(const change of [
+  s=>s.questionIds=[q.id,q.id], s=>s.responseIds=['r','r'], s=>s.index=.5,
+  s=>s.startedAt='not-a-date', s=>s.deadline='not-a-date', s=>s.draftAnswers[q.id]={answer:[1]},
+  s=>s.confidence[q.id]='0', s=>s.assisted[q.id]=1, s=>s.started[q.id]='no', s=>s.previouslySeen={[q.id]:1},
+  s=>s.questionSnapshots[q.id].options=[], s=>s.questionSnapshots.other=structuredClone(s.questionSnapshots[q.id])
+ ]){
+  const active=base();change(active);const withActive=structuredClone(state);withActive.sessions.quiz=active;
+  assert.throws(()=>C.parseImport(JSON.stringify({schemaVersion:2,state:withActive})));
+  const saved=base();change(saved);const withSaved=structuredClone(state);withSaved.sessions.saved={[saved.id]:saved};
+  assert.throws(()=>C.parseImport(JSON.stringify({schemaVersion:2,state:withSaved})));
+ }
 });
 
 test('merge fills an already opened empty lesson, preserves filled fields and earlier review',()=>{

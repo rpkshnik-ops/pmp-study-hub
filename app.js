@@ -1,7 +1,7 @@
 /* UI layer. Content lives in JSON packs; persistence and scoring live in core.js. */
 'use strict';
 (() => {
-  const C = globalThis.PMPCore, config = globalThis.PMPConfig;
+  const C = globalThis.PMPCore, L = globalThis.PMPLearning, config = globalThis.PMPConfig;
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const uid = () => crypto.randomUUID();
@@ -11,7 +11,7 @@
   const steps = [['read','Понятия','8 мин'],['example','Разобранный пример','4 мин'],['recall','Вспомнить','4 мин'],['case','Новая ситуация','8 мин'],['artifact','Применить','6 мин'],['check','Проверить','5 мин']];
   const modes = {foundation:'Фундамент — 24 недели',practice:'Практика и поддержание',intensive:'Экзаменационный интенсив'};
   let state, lessons=[], questions=[], cards=[], stale=false, persistenceError=false, pendingImport, timer;
-  let currentRoute={name:'today',params:new URLSearchParams()}, waitingWorker;
+  let currentRoute={name:'today',params:new URLSearchParams()}, waitingWorker,reviewExtra=0;
   const getLesson = id => lessons.find(l=>l.id===id);
   const getQuestion = id => questions.find(q=>q.id===id);
   const sessionQuestion = s => s.questionSnapshots?.[s.questionIds[s.index]] || getQuestion(s.questionIds[s.index]);
@@ -51,19 +51,41 @@
   }
   function today() {
     if(!state.onboarding) return pageHeading('Первый вход','Начнём с вашей цели','Освоить управление проектами и применять его в работе — затем готовиться к PMP по мере накопления опыта.')+profileForm(true);
-    const next=lessons.find(l=>!state.completedLessons.includes(l.id))||lessons[0];
+    const recommended=L.recommend(lessons,cards,state),next=recommended.lesson||lessons[lessons.length-1];
     const due=cards.filter(c=>state.reviews[c.id]&&new Date(state.reviews[c.id].dueAt)<=new Date());
-    const results=C.readiness(eligibleBank(),state.attempts), weekMinutes=Math.round(state.profile.hours*60);
+    const stats=L.statistics(lessons,state),results={correct:stats.overall.correct,eligible:stats.overall.n},weekMinutes=Math.round(state.profile.hours*60);
+    const shortHref=due.length?'#review':lessonUrl(next.id,state.completedLessons.includes(next.id)||work(next.id).step!=='read'?'recall':'read');
     return pageHeading('Сегодня',state.profile.name?'Добрый день, '+state.profile.name:'Один следующий шаг','Чтение даёт основу. Понимание проверяется объяснением, новой ситуацией и рабочим результатом.')+
-    '<section class="hero"><div class="panel"><p class="eyebrow">Неделя '+next.week+' · '+esc(modes[state.settings.mode])+'</p><h2>'+esc(next.title)+'</h2><p>'+esc(next.objectives[0])+'</p><p class="muted">Следующая тема выбрана по незавершённой практике. Уже начатые ответы можно продолжить.</p><div class="actions"><a class="button" href="'+lessonUrl(next.id,work(next.id).step)+'">Начать занятие</a><a class="button quiet" href="'+lessonUrl(next.id,'recall')+'">Есть 10–15 минут</a></div><small>Полное занятие: примерно 35 минут вместе с самостоятельными заданиями. Темп можно менять.</small></div>'+
-    '<aside class="panel"><p class="eyebrow">Мой фундамент</p><div class="metric">'+state.completedLessons.length+' / 24</div><p>уроков с выполненной практикой</p><progress max="24" value="'+state.completedLessons.length+'"></progress><p>'+results.correct+' самостоятельных верных ответов из '+results.eligible+' впервые решённых проверенных сценариев.</p><small>Это учебная статистика, не оценка допуска или вероятность сдачи PMP.</small></aside></section>'+
+    '<section class="hero"><div class="panel"><p class="eyebrow">'+esc(modes[state.settings.mode])+'</p><h2>'+esc(recommended.title)+'</h2><p>'+esc(recommended.reason)+'</p><div class="actions"><a class="button" href="'+recommended.href+'">Начать занятие</a><a class="button quiet" href="'+shortHref+'">Есть 10–15 минут</a></div><small>Ориентир: '+recommended.minutes+' минут. Длинную практику можно разбить на несколько подходов; черновик сохранится.</small></div>'+
+    '<aside class="panel"><p class="eyebrow">Мой фундамент</p><div class="metric">'+state.completedLessons.length+' / 24</div><p>уроков с выполненной практикой</p><progress max="24" value="'+state.completedLessons.length+'"></progress><p>'+results.correct+' самостоятельных верных ответов из '+results.eligible+' впервые решённых проверенных сценариев.</p><a href="#progress">Слабые темы и следующий шаг</a><p><small>Это учебная статистика, не оценка допуска или вероятность сдачи PMP.</small></p></aside></section>'+
     '<div class="grid"><article class="card"><h3>Повторить</h3><p>'+due.length+' карточек из изученных тем готовы к повторению. На сегодня достаточно пяти.</p><a href="#review">Открыть повторение</a></article><article class="card"><h3>Изучить</h3><p>Бюджет недели: '+weekMinutes+' минут. При 5 часах: 4 × 35 минут, практика 100 минут и обзор 60 минут.</p><a href="#route">Настроить маршрут</a></article><article class="card"><h3>Применить</h3><p>'+esc(next.artifact.title)+'. Заполните документ на собственном или учебном проекте.</p><a href="'+lessonUrl(next.id,'artifact')+'">К мини-практике</a></article></div>';
   }
   function routePage() {
     return pageHeading('Мой маршрут','24 учебные недели и 2 резервные','Переход определяется освоением и вашей целью. Пропуск не создаёт штрафа или бесконечного долга.')+
+    '<div class="callout"><h2>Мой план на неделю</h2><p>Теперь у каждой темы есть отдельные задания для объяснения, переноса и применения. Отметка о прохождении урока не закрывает всю неделю.</p><a class="button" href="#week">Открыть следующий шаг недели</a></div>'+
     '<div class="grid">'+Object.entries(modes).map(([key,label])=>'<article class="card"><h2>'+esc(label)+'</h2><p>'+({foundation:'В неделю: четыре коротких занятия, большая практика и обзор. Каждый урок можно разбить на несколько подходов.',practice:'Ориентир 1,5–2 часа: повторение, новая ситуация, применение на работе и запись опыта.',intensive:'8–12 недель ближе к выбранному экзамену: проверка правил, слабые темы и новые независимые пробники.'}[key])+'</p><button data-action="mode" data-mode="'+key+'" class="'+(state.settings.mode===key?'secondary':'')+'">'+(state.settings.mode===key?'Выбрано':'Выбрать')+'</button></article>').join('')+'</div>'+
     '<h2>Рабочие результаты по неделям</h2><div class="grid two">'+lessons.map(lessonCard).join('')+'</div>'+
     '<div class="callout">Резервные недели 25–26: закончите начатые документы, повторите трудные темы и примените один инструмент на работе. Не нужно догонять календарь ценой понимания.</div>';
+  }
+  function weekPage(){
+    const lesson=getLesson(currentRoute.params.get('id'))||L.selectLesson(lessons,state)||getLesson(state.settings.studyWeek?.lessonId)||lessons[23],plan=L.week(lesson,state);
+    const task=plan.items.find(t=>t.id===currentRoute.params.get('task'))||plan.items.find(t=>!t.done)||plan.items[0],fields=work(lesson.id).fields;
+    return pageHeading('Неделя '+lesson.week,lesson.title,'План — последовательность результатов. Продвигайтесь в своём темпе; пропуски не накапливают долг.')+
+      '<label class="compact">Выбрать тему<select id="weekSelect">'+lessons.map(l=>'<option value="'+l.id+'"'+(l.id===lesson.id?' selected':'')+'>'+l.week+'. '+esc(l.title)+'</option>').join('')+'</select></label>'+
+      '<div class="panel"><div class="inline"><b>'+plan.done+' / '+plan.items.length+' шагов выполнено</b><span>План: '+plan.total+' мин · осталось '+plan.remaining+' мин</span></div><progress value="'+plan.done+'" max="'+plan.items.length+'"></progress><p>Доступно '+plan.budget+' мин в неделю. '+(plan.weeks>1?'Оставшаяся практика рассчитана примерно на '+plan.weeks+' недели при вашем бюджете.':'Можно выполнить оставшийся объём в пределах недели.')+' Это план времени, а не измеренная длительность.</p>'+(state.settings.mode!=='foundation'?'<p>В этом режиме план начинается заново каждую календарную неделю. Предыдущие записи остаются в экспорте.</p>':'')+'</div>'+
+      '<div class="lesson-shell weekly"><aside class="lesson-nav" aria-label="Шаги недели">'+plan.items.map(t=>'<a href="#week?id='+lesson.id+'&task='+t.id+'"'+(t.id===task.id?' aria-current="step"':'')+'>'+(t.done?'✓ ':'')+esc(t.title)+'<small>'+t.minutes+' мин</small></a>').join('')+'</aside>'+
+      '<section class="lesson-body"><h2>'+esc(task.title)+'</h2>'+list(task.instructions,true)+'<div class="callout"><b>Результат:</b> '+esc(task.result)+'</div><p><a href="'+lessonUrl(lesson.id,task.step)+'">Открыть материал и пример по теме</a> · <a href="#review">Повторить карточки</a></p>'+
+      savedField(lesson.id,task.key+'note','Мой результат, обоснование и следующий шаг',task.result)+
+      '<label>Самопроверка<select data-work="'+lesson.id+'" data-field="'+task.key+'check"><option value="">Выберите</option><option value="yes"'+(fields[task.key+'check']==='yes'?' selected':'')+'>Сверил с критериями и отметил оставшиеся сомнения</option></select></label><p class="form-note">Это ваша самооценка. Приложение сохраняет работу, но не проверяет смысл открытого ответа автоматически.</p><button data-action="complete-week" data-id="'+lesson.id+'" data-task="'+task.id+'">'+(task.done?'Сохранить уточнения':'Отметить шаг выполненным')+'</button> <button class="quiet" data-action="export-week" data-id="'+lesson.id+'">Скачать работу недели</button><div id="weekFeedback" role="status"></div>'+(task.done?'<p class="feedback">Результат сохранён. <a href="#week?id='+lesson.id+'">К следующему незавершённому шагу</a></p>':'')+'</section></div>';
+  }
+  function progressPage(){
+    const report=L.statistics(lessons,state),weak=report.topics.filter(t=>t.priority>0||t.helped>0).sort((a,b)=>b.priority-a.priority||b.helped-a.helped).slice(0,3);
+    return pageHeading('Мой прогресс','Что получается и что повторить','Результат урока, самостоятельное решение и применение на работе — разные свидетельства обучения.')+
+      '<div class="grid">'+report.domains.map(d=>'<article class="card"><h2>'+esc(d.id)+'</h2><div class="metric">'+d.correct+' / '+d.n+'</div><p>самостоятельных верных первых ответов</p><small>'+(d.n<10?'Мало данных: меньше 10 сценариев. Процент готовности не выводится.':d.score+'% на этой учебной выборке; это не прогноз результата экзамена.')+'</small></article>').join('')+'</div>'+
+      '<p>Среди первых ответов: с подсказкой — '+report.helped+', после предыдущего знакомства с вопросом — '+report.repeated+'. Они, а также прежние версии и вопросы с отмеченной неоднозначностью, не повышают эти показатели.</p>'+
+      '<h2>На что обратить внимание</h2>'+(weak.length?'<div class="grid">'+weak.map(t=>{const l=getLesson(t.id);return '<article class="card"><h3>'+esc(l.title)+'</h3><p>'+t.correct+' верных из '+t.n+' самостоятельных; сомнений: '+t.uncertain+'.</p><a href="#week?id='+l.id+'&task=recall">Восстановить принцип</a> · <a href="'+lessonUrl(l.id,'case')+'">Применить в ситуации</a></article>';}).join('')+'</div>':'<p>Пока нет выявленных слабых тем. Это может означать, что самостоятельных ответов ещё мало. Начните с первого урока.</p>')+
+      '<h2>Темы и выполненная работа</h2><div class="table-scroll"><table><thead><tr><th scope="col">Тема</th><th scope="col">Учебная работа</th><th scope="col">Самостоятельные ответы</th><th scope="col">План</th></tr></thead><tbody>'+report.topics.map(t=>{const l=getLesson(t.id),plan=L.week(l,state),revealed=work(l.id).revealed.length;return '<tr><th scope="row"><a href="'+lessonUrl(l.id)+'">'+l.week+'. '+esc(l.title)+'</a></th><td>'+(t.completed?'Практика выполнена':'В работе')+'<br><small>открыто разборов: '+revealed+'</small></td><td>'+t.correct+' / '+t.n+'<br><small>с подсказкой: '+t.helped+'</small></td><td><a href="#week?id='+l.id+'">'+plan.done+' / '+plan.items.length+' шагов</a></td></tr>';}).join('')+'</tbody></table></div>'+
+      '<p class="form-note">В теме всего пять вопросов: этого мало для надёжного вывода об освоении. Открытые ответы сравнивайте с рубрикой; через 7–14 дней проверьте воспроизведение без разбора.</p>';
   }
   function library() {
     return pageHeading('Уроки и словарь','От понятия к управленческому решению','Все 24 темы доступны сразу. Для системного старта рекомендуем последовательность маршрута.')+
@@ -104,7 +126,7 @@
       '<h3>Закрыть занятие</h3><p>Отметка означает, что вы сделали учебную работу. Она не подтверждает профессиональную квалификацию.</p>'+
       '<label>Сейчас я…<select data-work="'+l.id+'" data-field="confidence"><option value="">Выберите</option>'+[['3','могу объяснить и применить'],['2','понимаю, но ещё сомневаюсь'],['1','нуждаюсь в повторении']].map(([v,t])=>'<option value="'+v+'"'+(w.fields.confidence===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>'+
       '<button data-action="complete" data-id="'+l.id+'">'+(state.completedLessons.includes(l.id)?'Сохранить результат занятия':'Завершить занятие')+'</button><div id="completionFeedback"></div>'+
-      (state.completedLessons.includes(l.id)?'<div class="feedback">Занятие завершено. Карточки назначены на завтра. <a href="'+(getLesson('L'+String(l.week+1).padStart(2,'0'))?lessonUrl('L'+String(l.week+1).padStart(2,'0')):'#route')+'">Следующий шаг</a></div>':'');
+      (state.completedLessons.includes(l.id)?'<div class="feedback">Занятие завершено. Дальше — применение и закрепление. <a href="#week?id='+l.id+'">Продолжить практику темы</a></div>':'');
     }
     const reviewed=l.status==='model_reviewed';
     return '<div class="lesson-shell"><aside class="lesson-nav"><p class="eyebrow">Урок '+l.week+' · ~35 мин</p>'+steps.map(([k,title,time])=>'<a href="'+lessonUrl(l.id,k)+'"'+(k===step?' aria-current="step"':'')+'>'+title+'<small>'+time+'</small></a>').join('')+'<p class="save-status">Ответы сохраняются автоматически</p></aside>'+
@@ -113,11 +135,10 @@
     '<details><summary>Источники и учебная привязка</summary><p>'+esc(l.eco.taskLabel)+'. Привязка к ECO — авторская классификация темы. Проверено '+config.checkedAt+'.</p>'+sourceLinks(l.sourceRefs)+'</details></article></div>';
   }
   function startPractice(lessonId,kind='lesson') {
-    const pool=lessonId?getLesson(lessonId).questions:eligibleBank().filter(q=>(q.status==='model_reviewed'||q.status==='expert_reviewed')&&!state.exposures.some(x=>x.id===q.scenarioFamilyId));
-    const selected=lessonId?pool:pool.filter((q,i)=>pool.findIndex(x=>x.scenarioFamilyId===q.scenarioFamilyId)===i).slice(0,10);
+    const selected=lessonId?getLesson(lessonId).questions.filter(q=>!state.quarantined.some(x=>x.questionId===q.id)):L.freshQuestions(lessons,state);
     if(!selected.length){toast('Нет новых проверенных вопросов. Можно повторить учебные вопросы конкретного урока.');return;}
     parkSession();
-    state.sessions.quiz={id:uid(),kind,lessonId:lessonId||'',questionIds:selected.map(q=>q.id),questionSnapshots:Object.fromEntries(selected.map(q=>[q.id,structuredClone(getQuestion(q.id))])),index:0,startedAt:now(),deadline:kind==='timed'?new Date(Date.now()+selected.length*90*1000).toISOString():'',draftAnswers:{},confidence:{},assisted:{},started:{},responseIds:[],finished:false};
+    state.sessions.quiz={id:uid(),kind,lessonId:lessonId||'',questionIds:selected.map(q=>q.id),previouslySeen:Object.fromEntries(selected.map(q=>[q.id,state.exposures.some(x=>x.id===q.scenarioFamilyId)])),questionSnapshots:Object.fromEntries(selected.map(q=>[q.id,structuredClone(getQuestion(q.id))])),index:0,startedAt:now(),deadline:kind==='timed'?new Date(Date.now()+selected.length*90*1000).toISOString():'',draftAnswers:{},confidence:{},assisted:{},started:{},responseIds:[],finished:false};
     persist();location.hash='#practice?session=active';
     if(currentRoute.params.get('session')==='active') render();
   }
@@ -147,14 +168,16 @@
     return pageHeading('Практика', 'Вопрос '+(s.index+1)+' из '+s.questionIds.length)+
       '<div class="compact"><p class="question-number">'+esc(getLesson(q.lessonId)?.title||q.topic||'')+' · '+esc(q.approach)+(s.deadline?' · Осталось <span id="timer" class="timing"></span>':'')+'</p><h2>'+esc(q.prompt)+'</h2>'+
       (state.quarantined.some(x=>x.questionId===q.id)?'<div class="callout">Вы сообщили о неоднозначности. Этот вопрос исключён из статистики знаний.</div>':'')+
-      (a?feedback(q,a):'<form id="answerForm"><fieldset><legend>'+(q.type==='multi'?'Выберите все подходящие ответы':q.type==='matching'?'Сопоставьте элементы':'Ваш ответ')+'</legend>'+controls+'</fieldset>'+
+      (a?(s.kind==='timed'?'<div class="feedback">Ответ сохранён. Результаты и объяснения откроются после завершения тренировки.</div>':feedback(q,a)):'<form id="answerForm"><fieldset><legend>'+(q.type==='multi'?'Выберите все подходящие ответы':q.type==='matching'?'Сопоставьте элементы':'Ваш ответ')+'</legend>'+controls+'</fieldset>'+
       '<label>Перед разбором оцените уверенность<select name="confidence" required><option value="">Выберите</option>'+[['3','знаю'],['2','сомневаюсь'],['1','угадал']].map(([v,t])=>'<option value="'+v+'"'+(String(s.confidence[q.id])===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>'+
       '<details id="questionHint"><summary>Дай подсказку</summary><p>'+esc(q.hint)+'</p></details><button type="submit">Проверить ответ</button><p id="answerError" class="error" role="status"></p></form>')+
       '<div class="actions">'+(a?'<button data-action="next-question">'+(s.index+1===s.questionIds.length?'Завершить сессию':'Следующий вопрос')+'</button>':'')+'<a href="#practice">К списку тем</a><button class="quiet" data-action="ambiguity" data-id="'+q.id+'">Сообщить о неоднозначности</button></div></div>';
   }
   function feedback(q,a) {
     const correct=q.type==='numeric'?q.answer+(q.unit?' '+q.unit:''):q.type==='matching'?q.left.map((x,i)=>x+' → '+q.right[q.correct[i]]).join('; '):q.correct.map(i=>q.options[i]).join('; ');
-    return '<div class="feedback '+(a.correct?'':'bad')+'"><h3>'+(a.correct?'Верно':'Есть расхождение')+(a.assisted?' · с подсказкой':'')+'</h3><p><b>Ответ:</b> '+esc(correct)+'</p><p>'+esc(q.principle)+'</p>'+list(q.explanations)+
+    const own=q.type==='numeric'?a.answer:q.type==='matching'?q.left.map((x,i)=>x+' → '+(q.right[a.answer?.[i]]||'не выбрано')).join('; '):(Array.isArray(a.answer)?a.answer:[]).map(i=>q.options[i]).join('; ');
+    const explanations=q.options?q.options.map((option,i)=>'<li><b>'+esc(option)+'</b><br>'+esc(q.explanations[i])+'</li>').join(''):q.type==='matching'?q.left.map((left,i)=>'<li><b>'+esc(left)+' → '+esc(q.right[q.correct[i]])+'</b><br>'+esc(q.explanations[i])+'</li>').join(''):q.explanations.map(x=>'<li>'+esc(x)+'</li>').join('');
+    return '<div class="feedback '+(a.correct?'':'bad')+'"><h3>'+(a.correct?'Верно':'Есть расхождение')+(a.assisted?' · с подсказкой':'')+(a.priorExposure?' · знакомая ситуация':'')+'</h3><p><b>Ваш ответ:</b> '+esc(own)+'</p><p><b>Верный ответ:</b> '+esc(correct)+'</p><p>'+esc(q.principle)+'</p><h4>Почему каждый вариант подходит или не подходит</h4><ul class="steps">'+explanations+'</ul>'+
       (!a.correct?'<label>Что затруднило решение?<select data-error-attempt="'+a.id+'"><option value="">Выберите причину</option>'+['Пробел в знании','Неверно прочитал ситуацию','Путаница подходов','Терминология','Расчёт','Спешка'].map(reason=>'<option'+(state.templates['error-'+a.id]===reason?' selected':'')+'>'+reason+'</option>').join('')+'</select></label><p><a href="'+lessonUrl(q.lessonId)+'">Повторить принцип в уроке</a></p>':'')+'</div>';
   }
   function quizSummary(s) {
@@ -166,8 +189,10 @@
   }
   function reviewPage() {
     const due=cards.filter(c=>state.reviews[c.id]&&new Date(state.reviews[c.id].dueAt)<=new Date()).sort((a,b)=>new Date(state.reviews[a.id].dueAt)-new Date(state.reviews[b.id].dueAt));
-    const c=due[0],errors=state.attempts.filter(a=>!a.correct).slice(-10).reverse();
+    const todayCount=L.reviewedToday(state),c=todayCount<5+reviewExtra?due[0]:null,errors=state.attempts.filter(a=>!a.correct).slice(-10).reverse();
+    if(!c&&due.length)return pageHeading('Повторение','Порция на сегодня выполнена','Сегодня повторено '+todayCount+' карточек. Остальные '+due.length+' можно перенести на другой день.')+'<div class="actions"><a class="button" href="#week">Вернуться к плану недели</a><button data-action="more-reviews" class="secondary">Ещё пять по желанию</button></div>';
     return pageHeading('Ошибки и повторение','Вспомните до показа ответа','Начальная схема — 1 / 3 / 7 / 14 / 30 дней. После ошибки или подсказки возвращаемся к одному дню; это удобное правило, не персонально оптимальный алгоритм.')+
+      '<p>Сегодня повторено: '+todayCount+' карточек. Базовая порция — пять.</p>'+
       (c?'<article class="panel compact"><p class="eyebrow">'+due.length+' карточек готовы · Урок '+getLesson(c.lessonId).week+'</p><h2>'+esc(c.front)+'</h2><button data-action="show-card" data-id="'+c.id+'">Показать ответ</button><div id="cardAnswer" hidden><p class="review-answer">'+esc(c.back)+'</p><div class="actions"><button data-action="rate-card" data-id="'+c.id+'" data-rating="3">Вспомнил сам</button><button data-action="rate-card" data-id="'+c.id+'" data-rating="2" class="secondary">Сомневался</button><button data-action="rate-card" data-id="'+c.id+'" data-rating="1" class="secondary">Не вспомнил</button></div></div></article>':'<div class="empty">На сегодня нет назначенных карточек. Завершите урок: его карточки появятся завтра. Изученные материалы доступны в библиотеке.</div>')+
       '<h2>Последние ошибки</h2>'+(errors.length?errors.map(a=>'<details><summary>'+esc(a.questionSnapshot.prompt)+'</summary>'+feedback(a.questionSnapshot,a)+'</details>').join(''):'<p>Ошибок в новых вопросах пока нет.</p>');
   }
@@ -205,9 +230,11 @@
   function readBackups() { try { const b=JSON.parse(localStorage.getItem(C.BACKUP_KEY)||'[]');return Array.isArray(b)?b:[]; }catch{return [];} }
   function render() {
     clearInterval(timer);
+    const pinned=state.settings.studyWeek;
+    if(state.settings.mode!=='foundation'&&(!pinned||pinned.mode!==state.settings.mode||pinned.cycle!==L.cycleKey())){const chosen=L.selectLesson(lessons,state);if(chosen){state.settings.studyWeek={mode:state.settings.mode,cycle:L.cycleKey(),lessonId:chosen.id};persist();}}
     const [name,query='']=(location.hash.slice(1)||'today').split('?'); currentRoute={name,params:new URLSearchParams(query)};
-    const views={today,route:routePage,lessons:library,lesson:lessonPage,practice,review:reviewPage,exams:examsPage,experience:experiencePage,settings:settingsPage};
-    const nav=[['today','Сегодня'],['route','Маршрут'],['lessons','Уроки и словарь'],['practice','Практика'],['review','Повторение'],['exams','Пробные'],['experience','Опыт'],['settings','Настройки']];
+    const views={today,route:routePage,week:weekPage,progress:progressPage,lessons:library,lesson:lessonPage,practice,review:reviewPage,exams:examsPage,experience:experiencePage,settings:settingsPage};
+    const nav=[['today','Сегодня'],['route','Маршрут'],['lessons','Уроки и словарь'],['practice','Практика'],['progress','Прогресс'],['review','Повторение'],['exams','Пробные'],['experience','Опыт'],['settings','Настройки']];
     $('#nav').innerHTML=nav.map(([key,label])=>'<a href="#'+key+'"'+(key===(name==='lesson'?'lessons':name)?' aria-current="page"':'')+'>'+label+'</a>').join('');
     $('#nav').classList.remove('open');$('#menuBtn').setAttribute('aria-expanded','false');
     try { $('#main').innerHTML=(views[name]||today)();bindForms(); }
@@ -220,9 +247,10 @@
   }
   function exportState() { download('pmp-backup-'+now().slice(0,10)+'.json',JSON.stringify({schemaVersion:2,exportedAt:now(),state},null,2)); }
   function bindForms() {
+    $('#weekSelect')?.addEventListener('change',event=>{if(state.settings.mode!=='foundation'){state.settings.studyWeek={mode:state.settings.mode,cycle:L.cycleKey(),lessonId:event.target.value};persist();}location.hash='#week?id='+event.target.value;});
     $('#profileForm')?.addEventListener('submit',event=>{event.preventDefault();const f=new FormData(event.target),first=!state.onboarding;state.profile={name:f.get('name').trim(),education:f.get('education'),hours:Number(f.get('hours')),examDate:f.get('examDate'),language:f.get('language')};state.onboarding=true;if(persist()){toast('Настройки сохранены');if(first){location.hash='#today';render();}}});
     document.querySelectorAll('[data-reveal]').forEach(details=>details.addEventListener('toggle',()=>{if(details.open){const w=work(details.dataset.lesson);if(!w.revealed.includes(details.dataset.reveal)){w.revealed.push(details.dataset.reveal);persist();}}}));
-    $('#questionHint')?.addEventListener('toggle',event=>{if(event.target.open){const s=state.sessions.quiz;s.assisted[s.questionIds[s.index]]=true;persist();}});
+    $('#questionHint')?.addEventListener('toggle',event=>{if(event.target.open){const s=state.sessions.quiz,q=sessionQuestion(s);s.assisted[q.id]=true;const exposure=state.exposures.find(x=>x.id===q.scenarioFamilyId);if(exposure&&!exposure.helpAt)exposure.helpAt=now();persist();}});
     $('#answerForm')?.addEventListener('submit',submitAnswer);
     $('#answerForm')?.addEventListener('change',saveQuizDraft);
     $('#answerForm')?.addEventListener('input',saveQuizDraft);
@@ -244,7 +272,7 @@
     if(s.finished||(s.deadline&&C.remainingSeconds(s)===0)){s.finished=true;persist();render();return;}
     if(s.responseIds[s.index])return;
     if((Array.isArray(answer)&&(!answer.length||answer.includes(-1)))||answer===''){ $('#answerError').textContent='Сначала дайте ответ.';return; }
-    const a={id:uid(),questionId:q.id,questionVersion:q.version,questionSnapshot:structuredClone(q),answer,correct:C.grade(q,answer),confidence,assisted:!!s.assisted[q.id],answeredAt:now(),elapsedSeconds:Math.min(86400,Math.max(0,Math.round((Date.now()-new Date(s.started[q.id]).getTime())/1000)))};
+    const a={id:uid(),questionId:q.id,questionVersion:q.version,questionSnapshot:structuredClone(q),answer,correct:C.grade(q,answer),confidence,priorExposure:!!s.previouslySeen?.[q.id],assisted:!!s.assisted[q.id]||!!state.exposures.find(x=>x.id===q.scenarioFamilyId)?.helpAt,answeredAt:now(),elapsedSeconds:Math.min(86400,Math.max(0,Math.round((Date.now()-new Date(s.started[q.id]).getTime())/1000)))};
     state.attempts.push(a);s.responseIds[s.index]=a.id;
     if(!a.correct) cards.filter(c=>c.lessonId===q.lessonId).forEach(c=>state.reviews[c.id]=C.nextReview(state.reviews[c.id],false,confidence,false));
     if(persist())render();
@@ -285,9 +313,17 @@
       if(action==='timed')startPractice(null,'timed');
       if(action==='next-question'){const s=state.sessions.quiz;s.index++;if(s.index>=s.questionIds.length)s.finished=true;persist();render();}
       if(action==='complete')completeLesson(id);
+      if(action==='complete-week'){
+        const l=getLesson(id),task=L.week(l,state).items.find(t=>t.id===b.dataset.task),f=work(id).fields;
+        if(task.id==='lesson'&&l.recall.prompts.some((_,i)=>(f['recall-'+i]||'').trim().length<10)){$('#weekFeedback').textContent='Запишите три ответа на шаге урока «Вспомнить». Полное завершение урока для этого блока не требуется.';return;}
+        if((f[task.key+'note']||'').trim().length<30||f[task.key+'check']!=='yes'){$('#weekFeedback').textContent='Запишите результат хотя бы одним содержательным предложением и выполните самопроверку.';return;}
+        f[task.key+'-done']=now();if(persist()){render();toast('Шаг недели сохранён.');}
+      }
+      if(action==='export-week'){const l=getLesson(id);download(id+'-week.md','# '+l.title+'\n\n'+L.week(l,state).items.map(t=>'## '+t.title+'\n'+(work(id).fields[t.key+'note']||'Ещё не заполнено')).join('\n\n'),'text/markdown;charset=utf-8');}
       if(action==='ambiguity'){if(!state.quarantined.some(x=>x.questionId===id))state.quarantined.push({id:uid(),questionId:id,at:now()});persist();toast('Вопрос исключён из статистики на этом устройстве.');}
       if(action==='show-card'){$('#cardAnswer').hidden=false;b.hidden=true;}
-      if(action==='rate-card'){const rating=Number(b.dataset.rating);state.reviews[id]=C.nextReview(state.reviews[id],rating!==1,rating,false);persist();render();}
+      if(action==='rate-card'){const rating=Number(b.dataset.rating);state.reviews[id]={...C.nextReview(state.reviews[id],rating!==1,rating,false),lastReviewedDay:L.dayKey(),lastRating:rating};persist();render();}
+      if(action==='more-reviews'){reviewExtra+=5;render();}
       if(action==='export')exportState();
       if(action==='download-backup'){const backup=readBackups()[Number(b.dataset.index)];download('pmp-previous-state.json',JSON.stringify({schemaVersion:2,state:backup.state},null,2));}
       if(action==='merge'||action==='replace'){

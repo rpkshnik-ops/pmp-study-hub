@@ -1,6 +1,6 @@
 'use strict';
 globalThis.PMPConfig = {
-  version: '2.0.0', contentVersion: '2026.2', checkedAt: '2026-09-18',
+  version: '2.1.0', contentVersion: '2026.2', checkedAt: '2026-09-18',
   packs: [1,2,3,4,5,6].map(n => `content/pack-${String(n).padStart(2,'0')}.json`),
   blueprint: {id:'ECO-2026-08-11',domains:{People:33,Process:41,'Business Environment':26},questions:180,minutes:240,reserveRequired:180},
   eligibility: {id:'eligibility-2026-08-11',windowMonths:120,months:{secondary:60,associate:48,bachelor:36,gac:24},trainingHours:35,providerChange:'2026-12-01'},

@@ -5,7 +5,7 @@ from urllib.parse import unquote, urlsplit
 import argparse
 
 ROOT = Path(__file__).resolve().parent
-ALLOWED = {"index.html", "styles.css", "app.js", "core.js", "config.js", "sw.js", "manifest.webmanifest", "icon.svg"}
+ALLOWED = {"index.html", "styles.css", "app.js", "core.js", "learning.js", "config.js", "sw.js", "manifest.webmanifest", "icon.svg"}
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

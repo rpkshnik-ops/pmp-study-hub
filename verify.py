@@ -67,9 +67,9 @@ def check_content():
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true');args=parser.parse_args()
     subprocess.run([sys.executable,str(ROOT/'tools'/'release.py')],check=True)
-    for file in ['app.js','core.js','config.js','sw.js']:
+    for file in ['app.js','core.js','learning.js','config.js','sw.js']:
         subprocess.run([NODE,'--check',str(ROOT/file)],check=True)
-    subprocess.run([NODE,'--test',str(ROOT/'tests'/'core.test.cjs')],check=True)
+    subprocess.run([NODE,'--test',*[str(p) for p in sorted((ROOT/'tests').glob('*.test.cjs'))]],check=True)
     check_content()
     if args.browser:subprocess.run([sys.executable,str(ROOT/'browser_check.py')],cwd=ROOT,check=True)
     print('PASS: syntax, deterministic behavior and content integrity'+(', browser workflows' if args.browser else ''))

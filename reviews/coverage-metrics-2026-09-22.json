@@ -1,0 +1,1034 @@
+{
+  "method": "Direct primary metadata only. Counts do not prove depth, correct mapping, scenario independence or exam readiness.",
+  "ecoVersion": "2026-08-11",
+  "inputSha256LF": {
+    "content/pack-01.json": "7b2149629465268198b665a148296fba26a83188572e1a27296cecc59b02c81b",
+    "content/pack-02.json": "b7c772cff9bb20d72683c942cfe2c7ac3370212fa01a5ac73502727cbf7b71b8",
+    "content/pack-03.json": "a300182d504d8305346f650af44ee01bb5f783bdbce8e47dcac55ed2746ff135",
+    "content/pack-04.json": "441267b13937dd9e62cebfbc6dafa70e01c753a28a6194aae6c8a4381ba9b139",
+    "content/pack-05.json": "160dfaa70299e401effefd3ca734001f4f8ba753d5bb93b5d10164579c859943",
+    "content/pack-06.json": "1fedd360de1a9a65d2ee67b77b79b5d6fdfe4c18aee3c95a6c31202d79de799f"
+  },
+  "counts": {
+    "packs": 6,
+    "lessons": 24,
+    "questions": 120,
+    "cards": 60,
+    "transferCases": 24,
+    "artifacts": 24,
+    "reserveQuestions": 0,
+    "uniqueQuestionIds": 120,
+    "uniqueScenarioFamilyIds": 120
+  },
+  "questionMetadata": {
+    "type": {
+      "matching": 18,
+      "multi": 23,
+      "numeric": 6,
+      "single": 73
+    },
+    "approach": {
+      "agile": 24,
+      "hybrid": 67,
+      "predictive": 29
+    },
+    "difficulty": {
+      "analysis": 42,
+      "application": 42,
+      "foundation": 36
+    },
+    "context": {
+      "other": 53,
+      "sap": 67
+    },
+    "status": {
+      "model_reviewed": 120
+    }
+  },
+  "domains": [
+    {
+      "domain": "People",
+      "questions": 24,
+      "bankPercent": 20.0,
+      "ecoPercent": 33
+    },
+    {
+      "domain": "Process",
+      "questions": 66,
+      "bankPercent": 55.0,
+      "ecoPercent": 41
+    },
+    {
+      "domain": "Business Environment",
+      "questions": 30,
+      "bankPercent": 25.0,
+      "ecoPercent": 26
+    }
+  ],
+  "ecoTasks": [
+    {
+      "domain": "People",
+      "taskId": 1,
+      "lessonIds": [],
+      "questionIds": []
+    },
+    {
+      "domain": "People",
+      "taskId": 2,
+      "lessonIds": [
+        "L11"
+      ],
+      "questionIds": [
+        "Q11-1",
+        "Q11-2",
+        "Q11-3",
+        "Q11-4"
+      ]
+    },
+    {
+      "domain": "People",
+      "taskId": 3,
+      "lessonIds": [
+        "L09",
+        "L12"
+      ],
+      "questionIds": [
+        "Q09-1",
+        "Q09-2",
+        "Q09-3",
+        "Q09-4",
+        "Q12-3",
+        "Q13-5"
+      ]
+    },
+    {
+      "domain": "People",
+      "taskId": 4,
+      "lessonIds": [
+        "L03"
+      ],
+      "questionIds": [
+        "Q03-1",
+        "Q03-2"
+      ]
+    },
+    {
+      "domain": "People",
+      "taskId": 5,
+      "lessonIds": [],
+      "questionIds": [
+        "Q03-3",
+        "Q03-4",
+        "Q03-5"
+      ]
+    },
+    {
+      "domain": "People",
+      "taskId": 6,
+      "lessonIds": [],
+      "questionIds": []
+    },
+    {
+      "domain": "People",
+      "taskId": 7,
+      "lessonIds": [],
+      "questionIds": [
+        "Q12-2",
+        "Q22-1"
+      ]
+    },
+    {
+      "domain": "People",
+      "taskId": 8,
+      "lessonIds": [
+        "L10"
+      ],
+      "questionIds": [
+        "Q10-1",
+        "Q10-2",
+        "Q10-3",
+        "Q10-4",
+        "Q10-5",
+        "Q12-1",
+        "Q12-4"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 1,
+      "lessonIds": [
+        "L05",
+        "L13",
+        "L16",
+        "L23"
+      ],
+      "questionIds": [
+        "Q02-2",
+        "Q02-4",
+        "Q05-2",
+        "Q05-3",
+        "Q05-4",
+        "Q05-5",
+        "Q07-5",
+        "Q13-1",
+        "Q15-5",
+        "Q16-1",
+        "Q16-3",
+        "Q23-3"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 2,
+      "lessonIds": [
+        "L04"
+      ],
+      "questionIds": [
+        "Q04-1",
+        "Q04-2",
+        "Q04-4",
+        "Q04-5",
+        "Q05-1",
+        "Q14-1",
+        "Q14-4"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 3,
+      "lessonIds": [
+        "L01",
+        "L14",
+        "L19"
+      ],
+      "questionIds": [
+        "Q01-1",
+        "Q01-2",
+        "Q01-3",
+        "Q01-4",
+        "Q01-5",
+        "Q13-4",
+        "Q14-3",
+        "Q14-5",
+        "Q19-1",
+        "Q19-2",
+        "Q19-3",
+        "Q19-4",
+        "Q19-5",
+        "Q23-5"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 4,
+      "lessonIds": [],
+      "questionIds": [
+        "Q07-2"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 5,
+      "lessonIds": [],
+      "questionIds": [
+        "Q18-3",
+        "Q18-5"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 6,
+      "lessonIds": [
+        "L07"
+      ],
+      "questionIds": [
+        "Q07-1"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 7,
+      "lessonIds": [
+        "L21"
+      ],
+      "questionIds": [
+        "Q07-3",
+        "Q07-4",
+        "Q13-2",
+        "Q14-2",
+        "Q21-1",
+        "Q21-3",
+        "Q21-5"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 8,
+      "lessonIds": [
+        "L06"
+      ],
+      "questionIds": [
+        "Q06-1",
+        "Q06-2",
+        "Q06-3",
+        "Q06-4",
+        "Q06-5"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 9,
+      "lessonIds": [
+        "L08",
+        "L15",
+        "L24"
+      ],
+      "questionIds": [
+        "Q08-1",
+        "Q08-2",
+        "Q08-3",
+        "Q08-4",
+        "Q08-5",
+        "Q13-3",
+        "Q15-1",
+        "Q15-3",
+        "Q15-4",
+        "Q16-4",
+        "Q24-1",
+        "Q24-2",
+        "Q24-3"
+      ]
+    },
+    {
+      "domain": "Process",
+      "taskId": 10,
+      "lessonIds": [
+        "L22"
+      ],
+      "questionIds": [
+        "Q21-2",
+        "Q22-2",
+        "Q22-3",
+        "Q22-5"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 1,
+      "lessonIds": [
+        "L02"
+      ],
+      "questionIds": [
+        "Q02-1",
+        "Q02-3",
+        "Q02-5",
+        "Q11-5",
+        "Q16-2",
+        "Q16-5"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 2,
+      "lessonIds": [
+        "L20"
+      ],
+      "questionIds": [
+        "Q12-5",
+        "Q20-1",
+        "Q20-2",
+        "Q20-3",
+        "Q20-4",
+        "Q20-5",
+        "Q23-2",
+        "Q24-5"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 3,
+      "lessonIds": [
+        "L18"
+      ],
+      "questionIds": [
+        "Q04-3",
+        "Q18-1",
+        "Q18-2",
+        "Q18-4",
+        "Q21-4",
+        "Q23-4"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 4,
+      "lessonIds": [],
+      "questionIds": [
+        "Q09-5",
+        "Q15-2",
+        "Q17-1",
+        "Q23-1",
+        "Q24-4"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 5,
+      "lessonIds": [
+        "L17"
+      ],
+      "questionIds": [
+        "Q17-2",
+        "Q17-3",
+        "Q17-4",
+        "Q17-5"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 6,
+      "lessonIds": [],
+      "questionIds": [
+        "Q22-4"
+      ]
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 7,
+      "lessonIds": [],
+      "questionIds": []
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 8,
+      "lessonIds": [],
+      "questionIds": []
+    }
+  ],
+  "tasksWithoutDirectQuestions": [
+    {
+      "domain": "People",
+      "taskId": 1
+    },
+    {
+      "domain": "People",
+      "taskId": 6
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 7
+    },
+    {
+      "domain": "Business Environment",
+      "taskId": 8
+    }
+  ],
+  "invalidTaskIds": [],
+  "answerLengthCue": {
+    "method": "Python len (Unicode code points). Correct answer must be strictly longer than every distractor; ties excluded.",
+    "singleQuestions": 73,
+    "correctStrictlyLongest": 69,
+    "percent": 94.52,
+    "questionIds": [
+      "Q01-1",
+      "Q01-2",
+      "Q01-5",
+      "Q02-2",
+      "Q02-3",
+      "Q02-5",
+      "Q03-1",
+      "Q03-3",
+      "Q03-4",
+      "Q03-5",
+      "Q04-1",
+      "Q04-3",
+      "Q04-5",
+      "Q05-2",
+      "Q05-3",
+      "Q06-3",
+      "Q06-4",
+      "Q07-1",
+      "Q07-2",
+      "Q07-4",
+      "Q08-3",
+      "Q08-4",
+      "Q09-1",
+      "Q09-3",
+      "Q09-4",
+      "Q09-5",
+      "Q10-1",
+      "Q10-3",
+      "Q10-5",
+      "Q11-1",
+      "Q11-2",
+      "Q11-4",
+      "Q11-5",
+      "Q12-2",
+      "Q12-3",
+      "Q12-4",
+      "Q12-5",
+      "Q13-2",
+      "Q13-5",
+      "Q14-1",
+      "Q14-3",
+      "Q14-5",
+      "Q15-2",
+      "Q15-5",
+      "Q16-1",
+      "Q16-4",
+      "Q16-5",
+      "Q17-1",
+      "Q17-4",
+      "Q17-5",
+      "Q18-1",
+      "Q18-4",
+      "Q18-5",
+      "Q19-1",
+      "Q19-4",
+      "Q19-5",
+      "Q20-1",
+      "Q20-4",
+      "Q20-5",
+      "Q21-4",
+      "Q21-5",
+      "Q22-1",
+      "Q22-4",
+      "Q22-5",
+      "Q23-2",
+      "Q23-4",
+      "Q23-5",
+      "Q24-1",
+      "Q24-5"
+    ]
+  },
+  "multiAnswerPositions": {
+    "method": "Zero-based option indices in source files; sorted sets of correct indices.",
+    "questions": 23,
+    "correctPositionCounts": {
+      "0": 23,
+      "1": 22,
+      "2": 9,
+      "3": 14
+    },
+    "keyPatterns": {
+      "0,1,2": 8,
+      "0,1,3": 14,
+      "0,2": 1
+    }
+  },
+  "instructionalWords": {
+    "method": "Whitespace tokens in introduction, section paragraphs, worked example, transfer context/analysis and artifact instructions/example; matches verify.py:text_count.",
+    "min": 683,
+    "max": 919,
+    "median": 805.0,
+    "total": 18911
+  },
+  "lessons": [
+    {
+      "id": "L01",
+      "title": "Проект, операции и проверяемая ценность",
+      "eco": {
+        "domain": "Process",
+        "taskId": 3,
+        "taskLabel": "Help ensure value-based delivery"
+      },
+      "instructionalWords": 796,
+      "questionIds": [
+        "Q01-1",
+        "Q01-2",
+        "Q01-3",
+        "Q01-4",
+        "Q01-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-PROJECT"
+      ]
+    },
+    {
+      "id": "L02",
+      "title": "Роли, жизненный цикл и этическое решение",
+      "eco": {
+        "domain": "Business Environment",
+        "taskId": 1,
+        "taskLabel": "Define and establish project governance"
+      },
+      "instructionalWords": 742,
+      "questionIds": [
+        "Q02-1",
+        "Q02-2",
+        "Q02-3",
+        "Q02-4",
+        "Q02-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020",
+        "PMI-ETHICS"
+      ]
+    },
+    {
+      "id": "L03",
+      "title": "Заинтересованные стороны и ожидания",
+      "eco": {
+        "domain": "People",
+        "taskId": 4,
+        "taskLabel": "Engage stakeholders"
+      },
+      "instructionalWords": 712,
+      "questionIds": [
+        "Q03-1",
+        "Q03-2",
+        "Q03-3",
+        "Q03-4",
+        "Q03-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-STAKEHOLDERS"
+      ]
+    },
+    {
+      "id": "L04",
+      "title": "Требования, критерии приёмки и границы объёма",
+      "eco": {
+        "domain": "Process",
+        "taskId": 2,
+        "taskLabel": "Develop and manage project scope"
+      },
+      "instructionalWords": 712,
+      "questionIds": [
+        "Q04-1",
+        "Q04-2",
+        "Q04-3",
+        "Q04-4",
+        "Q04-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L05",
+      "title": "Декомпозиция работ и оценки",
+      "eco": {
+        "domain": "Process",
+        "taskId": 1,
+        "taskLabel": "Develop an integrated project management plan and plan delivery"
+      },
+      "instructionalWords": 719,
+      "questionIds": [
+        "Q05-1",
+        "Q05-2",
+        "Q05-3",
+        "Q05-4",
+        "Q05-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "GAO-COST"
+      ]
+    },
+    {
+      "id": "L06",
+      "title": "Зависимости, критический путь и резерв времени",
+      "eco": {
+        "domain": "Process",
+        "taskId": 8,
+        "taskLabel": "Plan and manage schedule"
+      },
+      "instructionalWords": 726,
+      "questionIds": [
+        "Q06-1",
+        "Q06-2",
+        "Q06-3",
+        "Q06-4",
+        "Q06-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "GAO-SCHEDULE"
+      ]
+    },
+    {
+      "id": "L07",
+      "title": "Бюджет, ресурсы и план качества",
+      "eco": {
+        "domain": "Process",
+        "taskId": 6,
+        "taskLabel": "Plan and manage finance"
+      },
+      "instructionalWords": 723,
+      "questionIds": [
+        "Q07-1",
+        "Q07-2",
+        "Q07-3",
+        "Q07-4",
+        "Q07-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "GAO-COST"
+      ]
+    },
+    {
+      "id": "L08",
+      "title": "Освоенный объём и прогноз стоимости",
+      "eco": {
+        "domain": "Process",
+        "taskId": 9,
+        "taskLabel": "Evaluate project status"
+      },
+      "instructionalWords": 683,
+      "questionIds": [
+        "Q08-1",
+        "Q08-2",
+        "Q08-3",
+        "Q08-4",
+        "Q08-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-EVM"
+      ]
+    },
+    {
+      "id": "L09",
+      "title": "Лидерство команды и условия мотивации",
+      "eco": {
+        "domain": "People",
+        "taskId": 3,
+        "taskLabel": "Lead the project team"
+      },
+      "instructionalWords": 725,
+      "questionIds": [
+        "Q09-1",
+        "Q09-2",
+        "Q09-3",
+        "Q09-4",
+        "Q09-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L10",
+      "title": "Коммуникация, решение и обратная связь",
+      "eco": {
+        "domain": "People",
+        "taskId": 8,
+        "taskLabel": "Plan and manage communication"
+      },
+      "instructionalWords": 687,
+      "questionIds": [
+        "Q10-1",
+        "Q10-2",
+        "Q10-3",
+        "Q10-4",
+        "Q10-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-COMMS"
+      ]
+    },
+    {
+      "id": "L11",
+      "title": "Конфликт и переговоры по интересам",
+      "eco": {
+        "domain": "People",
+        "taskId": 2,
+        "taskLabel": "Manage conflicts"
+      },
+      "instructionalWords": 723,
+      "questionIds": [
+        "Q11-1",
+        "Q11-2",
+        "Q11-3",
+        "Q11-4",
+        "Q11-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-ETHICS"
+      ]
+    },
+    {
+      "id": "L12",
+      "title": "Распределённая команда и коучинговый разговор",
+      "eco": {
+        "domain": "People",
+        "taskId": 3,
+        "taskLabel": "Lead the project team"
+      },
+      "instructionalWords": 742,
+      "questionIds": [
+        "Q12-1",
+        "Q12-2",
+        "Q12-3",
+        "Q12-4",
+        "Q12-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L13",
+      "title": "Agile мышление и полная система Scrum",
+      "eco": {
+        "domain": "Process",
+        "taskId": 1,
+        "taskLabel": "Develop an integrated project management plan and plan delivery"
+      },
+      "instructionalWords": 850,
+      "questionIds": [
+        "Q13-1",
+        "Q13-2",
+        "Q13-3",
+        "Q13-4",
+        "Q13-5"
+      ],
+      "sourceIds": [
+        "SCRUM-2020",
+        "AGILE-MANIFESTO",
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L14",
+      "title": "Истории пользователей, приоритет и проверяемая приёмка",
+      "eco": {
+        "domain": "Process",
+        "taskId": 3,
+        "taskLabel": "Help ensure value-based delivery"
+      },
+      "instructionalWords": 858,
+      "questionIds": [
+        "Q14-1",
+        "Q14-2",
+        "Q14-3",
+        "Q14-4",
+        "Q14-5"
+      ],
+      "sourceIds": [
+        "SCRUM-2020",
+        "AGILE-MANIFESTO",
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L15",
+      "title": "Kanban: ограничение незавершённой работы и прогноз потока",
+      "eco": {
+        "domain": "Process",
+        "taskId": 9,
+        "taskLabel": "Evaluate project status"
+      },
+      "instructionalWords": 899,
+      "questionIds": [
+        "Q15-1",
+        "Q15-2",
+        "Q15-3",
+        "Q15-4",
+        "Q15-5"
+      ],
+      "sourceIds": [
+        "KANBAN-GUIDE",
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L16",
+      "title": "Гибридная поставка и осознанный выбор управления",
+      "eco": {
+        "domain": "Process",
+        "taskId": 1,
+        "taskLabel": "Develop an integrated project management plan and plan delivery"
+      },
+      "instructionalWords": 829,
+      "questionIds": [
+        "Q16-1",
+        "Q16-2",
+        "Q16-3",
+        "Q16-4",
+        "Q16-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "AGILE-MANIFESTO",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L17",
+      "title": "Риски, наступившие проблемы и ответные действия",
+      "eco": {
+        "domain": "Business Environment",
+        "taskId": 5,
+        "taskLabel": "Plan and manage risk"
+      },
+      "instructionalWords": 842,
+      "questionIds": [
+        "Q17-1",
+        "Q17-2",
+        "Q17-3",
+        "Q17-4",
+        "Q17-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L18",
+      "title": "Управление изменениями, полномочия и закупки",
+      "eco": {
+        "domain": "Business Environment",
+        "taskId": 3,
+        "taskLabel": "Manage and control changes"
+      },
+      "instructionalWords": 832,
+      "questionIds": [
+        "Q18-1",
+        "Q18-2",
+        "Q18-3",
+        "Q18-4",
+        "Q18-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L19",
+      "title": "Бизнес обоснование и управление получением пользы",
+      "eco": {
+        "domain": "Process",
+        "taskId": 3,
+        "taskLabel": "Help ensure value-based delivery"
+      },
+      "instructionalWords": 830,
+      "questionIds": [
+        "Q19-1",
+        "Q19-2",
+        "Q19-3",
+        "Q19-4",
+        "Q19-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-PROJECT"
+      ]
+    },
+    {
+      "id": "L20",
+      "title": "Соответствие требованиям, устойчивость и риски ИИ",
+      "eco": {
+        "domain": "Business Environment",
+        "taskId": 2,
+        "taskLabel": "Plan and manage project compliance"
+      },
+      "instructionalWords": 838,
+      "questionIds": [
+        "Q20-1",
+        "Q20-2",
+        "Q20-3",
+        "Q20-4",
+        "Q20-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "NIST-AI"
+      ]
+    },
+    {
+      "id": "L21",
+      "title": "Качество, приёмка пользователем и решение о запуске",
+      "eco": {
+        "domain": "Process",
+        "taskId": 7,
+        "taskLabel": "Plan and optimize quality of products/deliverables"
+      },
+      "instructionalWords": 814,
+      "questionIds": [
+        "Q21-1",
+        "Q21-2",
+        "Q21-3",
+        "Q21-4",
+        "Q21-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L22",
+      "title": "Передача результата, закрытие и уроки для следующей работы",
+      "eco": {
+        "domain": "Process",
+        "taskId": 10,
+        "taskLabel": "Manage project closure"
+      },
+      "instructionalWords": 831,
+      "questionIds": [
+        "Q22-1",
+        "Q22-2",
+        "Q22-3",
+        "Q22-4",
+        "Q22-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026"
+      ]
+    },
+    {
+      "id": "L23",
+      "title": "Интеграция решений: смешанный проект от запроса до перехода",
+      "eco": {
+        "domain": "Process",
+        "taskId": 1,
+        "taskLabel": "Develop an integrated project management plan and plan delivery"
+      },
+      "instructionalWords": 919,
+      "questionIds": [
+        "Q23-1",
+        "Q23-2",
+        "Q23-3",
+        "Q23-4",
+        "Q23-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "SCRUM-2020"
+      ]
+    },
+    {
+      "id": "L24",
+      "title": "Воспроизведение знаний, готовность и логика экзаменационного решения",
+      "eco": {
+        "domain": "Process",
+        "taskId": 9,
+        "taskLabel": "Evaluate project status"
+      },
+      "instructionalWords": 879,
+      "questionIds": [
+        "Q24-1",
+        "Q24-2",
+        "Q24-3",
+        "Q24-4",
+        "Q24-5"
+      ],
+      "sourceIds": [
+        "PMI-ECO-2026",
+        "PMI-NEW-2026",
+        "IES-LEARNING"
+      ]
+    }
+  ]
+}

@@ -1,10 +1,24 @@
 'use strict';
 globalThis.PMPConfig = {
-  version: '2.1.0', contentVersion: '2026.2', checkedAt: '2026-09-18',
+  version: '2.2.0', contentVersion: '2026.3', checkedAt: '2026-09-22',
   packs: [1,2,3,4,5,6].map(n => `content/pack-${String(n).padStart(2,'0')}.json`),
   blueprint: {id:'ECO-2026-08-11',domains:{People:33,Process:41,'Business Environment':26},questions:180,minutes:240,reserveRequired:180},
   eligibility: {id:'eligibility-2026-08-11',windowMonths:120,months:{secondary:60,associate:48,bachelor:36,gac:24},trainingHours:35,providerChange:'2026-12-01'},
+  pmbokDomains: [
+    {title:'Руководство проектом (Governance)',lessons:['L01','L02','L16','L18','L19','L22','L23']},
+    {title:'Содержание (Scope)',lessons:['L04','L05','L14','L18','L21']},
+    {title:'Сроки (Schedule)',lessons:['L05','L06','L13','L14','L15','L16']},
+    {title:'Финансы (Finance)',lessons:['L07','L08','L18','L19','L24']},
+    {title:'Заинтересованные стороны (Stakeholders)',lessons:['L03','L10','L11','L19','L22']},
+    {title:'Ресурсы (Resources)',lessons:['L02','L07','L09','L12','L16','L18']},
+    {title:'Риски (Risk)',lessons:['L17','L20','L21','L23','L24']}
+  ],
   sources: {
+    'NASA-SE-HANDBOOK': {title:'NASA — Systems Engineering Handbook',version:'SP-2016-6105 Rev 2; проверено 22.09.2026',url:'https://www.nasa.gov/wp-content/uploads/2018/09/nasa_systems_engineering_handbook_0.pdf'},
+    'PMBOK-8-TOC': {title:'PMI — PMBOK Guide, Eighth Edition: оглавление',version:'2025; проверено 22.09.2026',url:'https://www.pmi.org/-/media/pmi/documents/public/pdf/publications/pmbok-guide-eighth-edition_table-of-contents.pdf'},
+    'ASQ-COQ': {title:'ASQ — Cost of Quality',version:'Проверено 22.09.2026',url:'https://asq.org/quality-resources/cost-of-quality'},
+    'FAR': {title:'U.S. Federal Acquisition Regulation',version:'Subpart 4.8; Parts 15, 16, 32, 33, 46; проверено 22.09.2026',url:'https://www.acquisition.gov/browse/index/far'},
+    'NIST-SEMATECH': {title:'NIST/SEMATECH e-Handbook of Statistical Methods',version:'Проверено 22.09.2026',url:'https://www.itl.nist.gov/div898/handbook/'},
     'PMI-ECO-2026': {title:'PMI — PMP Examination Content Outline',version:'Revised 11 August 2026',url:'https://www.pmi.org/-/media/pmi/documents/public/pdf/certifications/pmp/pmp-examination-content-outline.pdf?rev=b8e1618215b74dfc926f5b406567f072'},
     'PMI-PROJECT': {title:'PMI — What is a project?',version:'Проверено 18.09.2026',url:'https://www.pmi.org/about/what-is-a-project'},
     'PMI-NEW-2026': {title:'PMI — изменения экзамена и обучения',version:'Проверено 18.09.2026',url:'https://www.pmi.org/certifications/project-management-pmp/new-exam'},

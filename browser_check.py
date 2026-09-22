@@ -36,13 +36,24 @@ def fill_work(page,prefix):
     for i,field in enumerate(page.locator('textarea[data-work]').all()):
         field.fill(f'{prefix}: осмысленный ответ {i+1}, владелец и наблюдаемый результат.')
 
-def answer(page,q,correct=True):
+def session_question(page, source):
+    """Use the persisted shuffled snapshot, never the source-bank answer order."""
+    question_id=source if isinstance(source,str) else source['id']
+    session=get_state(page)['sessions']['quiz']
+    assert session['questionIds'][session['index']]==question_id
+    question=session['questionSnapshots'][question_id]
+    assert question['id']==question_id
+    return question
+
+def answer(page,source,correct=True):
+    q=session_question(page,source)
     form=page.locator('#answerForm')
     if q['type'] in ('single','multi'):
         indices=q['correct'] if correct else [next(i for i in range(len(q['options'])) if i not in q['correct'])]
         for i in indices:form.locator(f'input[value="{i}"]').check()
     elif q['type']=='numeric':
-        form.locator('[name=numeric]').fill(str(q['answer']).replace('.',','))
+        value=q['answer'] if correct else q['answer']+q['tolerance']+1
+        form.locator('[name=numeric]').fill(str(value).replace('.',','))
     else:
         for i,index in enumerate(q['correct']):form.locator(f'[name=match-{i}]').select_option(str(index))
     form.locator('[name=confidence]').select_option('3')
@@ -59,10 +70,13 @@ def run():
         page.on('request',lambda r:external.append(r.url) if not r.url.startswith(url) else None)
         page.goto(url,wait_until='networkidle')
         page.locator('#profileForm button').click()
+        assert len(CONTENT)==24 and all(len(lesson['questions'])==8 for lesson in CONTENT)
+        assert sum(bool(lesson.get('caseStudy')) for lesson in CONTENT)==6
+        assert all(len([q for q in lesson['questions'] if not q.get('caseId')])==5 if lesson.get('caseStudy') else len([q for q in lesson['questions'] if not q.get('caseId')])==8 for lesson in CONTENT)
         assert 'step=read' in page.get_by_role('link',name='Есть 10–15 минут',exact=True).get_attribute('href')
         page.get_by_role('link',name='Начать занятие',exact=True).click()
         page.get_by_role('heading',name=CONTENT[0]['title'],exact=True).wait_for()
-        assert len(page.locator('.lesson-nav a').all())==6
+        assert len(page.locator('.lesson-nav a').all())==7
         page.goto(url+'/#lesson?id=L01&step=recall');fill_work(page,'Воспроизведение')
         draft=page.locator('textarea').first.input_value()
         page.reload(wait_until='networkidle')
@@ -76,16 +90,44 @@ def run():
         with page.expect_download() as artifact_download:
             page.get_by_role('button',name='Скачать мой документ').click()
         assert 'Рабочий документ' in Path(artifact_download.value.path()).read_text(encoding='utf-8')
+        # These presentation and persistence checks do not require scored items.
+        page.goto(url+'/#lessons');page.locator('#coverageMap summary').click()
+        assert page.locator('#coverageMap > ul.steps > li').count()==7
+        assert page.locator('#coverageMap > ol.steps > li').count()==26
+        l01=CONTENT[0];lab=l01['lab'];lab_key=f'lab-v{l01["version"]}-'
+        page.goto(url+'/#lesson?id=L01&step=lab')
+        assert page.locator('.data-table').count()==1 and not page.locator('details[data-reveal]').first.get_attribute('open')
+        page.locator('[data-action=complete-lab]').click()
+        assert not get_state(page)['lessonWork']['L01']['fields'].get(lab_key+'done')
+        lab_draft='Расчёт опирается на таблицу, показывает условие пересмотра и владельца следующего решения.'
+        for field in page.locator('textarea[data-work]').all():field.fill(lab_draft)
+        page.reload(wait_until='networkidle')
+        assert page.locator('textarea[data-work]').first.input_value()==lab_draft
+        for rubric in page.locator('select[data-work]').all():rubric.select_option('yes')
+        page.locator('[data-action=complete-lab]').click()
+        assert get_state(page)['lessonWork']['L01']['fields'][lab_key+'done']
+        with page.expect_download() as lab_download:page.locator('[data-action=export-lab]').click()
+        exported_lab=Path(lab_download.value.path()).read_text(encoding='utf-8')
+        assert lab['table']['caption'] in exported_lab and '|' in exported_lab
+        page.set_viewport_size({'width':375,'height':844})
+        for lesson_id in ['L15','L21']:
+            page.goto(url+'/#lesson?id='+lesson_id+'&step=lab')
+            assert page.locator('.data-table').count()==1 and page.locator('.data-chart svg').count()==1
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+1'),lesson_id
+        page.screenshot(path=str(ROOT/'tests'/'lab-mobile.png'),full_page=True)
+        page.set_viewport_size({'width':1280,'height':900})
         page.goto(url+'/#lesson?id=L01&step=check')
+        assert all(q['status'] in ('model_reviewed','expert_reviewed') for q in BANK.values()), 'Full browser verification requires reviewed content; a draft run cannot pass.'
         page.get_by_role('button',name='Решить вопросы урока').click()
-        for i,q in enumerate(CONTENT[0]['questions']):
+        normal_l01=[q for q in CONTENT[0]['questions'] if not q.get('caseId')]
+        for i,q in enumerate(normal_l01):
             answer(page,q,correct=i!=0)
             if i==0:
                 page.reload(wait_until='networkidle')
                 assert page.locator('#answerForm').count()==0
                 assert get_state(page)['attempts'][0]['correct'] is False
             page.locator('[data-action=next-question]').click()
-        assert len(get_state(page)['attempts'])==5
+        assert len(get_state(page)['attempts'])==len(normal_l01)
         page.get_by_role('link',name='Вернуться к завершению урока').click()
         page.locator('select[data-field=confidence]').select_option('3')
         page.locator('[data-action=complete]').click()
@@ -106,22 +148,54 @@ def run():
         page.goto(url+'/#progress')
         assert page.get_by_role('heading',name='Что получается и что повторить').is_visible()
         assert page.locator('tbody tr').count()==24
-        # Real numeric control, not a radio button disguised as a numeric question.
-        numeric=next(q for q in BANK.values() if q['type']=='numeric')
+        page.goto(url+'/#lessons');page.locator('#coverageMap summary').click()
+        assert page.locator('#coverageMap > ul.steps > li').count()==7
+        assert page.locator('#coverageMap > ol.steps > li').count()==26
+        # L03 case keeps one shared stimulus and delays any correctness disclosure.
+        l03=next(l for l in CONTENT if l['id']=='L03')
+        case_questions=[q for q in l03['questions'] if q.get('caseId')]
+        page.goto(url+'/#practice');page.locator('[data-action=start-case][data-id=L03]').click()
+        case_state=get_state(page)['sessions']['quiz']
+        assert case_state['kind']=='case' and case_state['questionIds']==[q['id'] for q in case_questions]
+        assert page.locator('.case-context .data-table').count()==1
+        previous_reviews=get_state(page)['reviews']
+        answer(page,case_questions[0],correct=False)
+        assert get_state(page)['attempts'][-1]['correct'] is False
+        assert get_state(page)['reviews']==previous_reviews
+        assert page.locator('.feedback').first.is_visible()
+        correct_option=case_questions[0]['options'][case_questions[0]['correct'][0]]
+        assert correct_option not in page.locator('#main').inner_text()
+        snapshots=json.dumps(get_state(page)['sessions']['quiz']['questionSnapshots'],sort_keys=True,ensure_ascii=False)
+        page.screenshot(path=str(ROOT/'tests'/'case-desktop.png'),full_page=True)
+        page.reload(wait_until='networkidle')
+        assert json.dumps(get_state(page)['sessions']['quiz']['questionSnapshots'],sort_keys=True,ensure_ascii=False)==snapshots
+        for route in ['progress','review']:
+            page.goto(url+'/#'+route);assert correct_option not in page.locator('#main').inner_text()
+        page.goto(url+'/#practice?session=active')
+        for q in case_questions[1:]:
+            page.locator('[data-action=next-question]').click();answer(page,q)
+        page.locator('[data-action=next-question]').click()
+        assert get_state(page)['sessions']['quiz']['finished']
+        assert all(c['id'] in get_state(page)['reviews'] for c in l03['cards'])
+        # Select an actual current numeric item and retain its unfinished draft.
+        numeric=next(q for q in BANK.values() if q['type']=='numeric' and not q.get('caseId'))
         lesson=next(l for l in CONTENT if any(q['id']==numeric['id'] for q in l['questions']))
         page.goto(url+'/#practice');page.locator(f'[data-action=start-practice][data-id={lesson["id"]}]').click()
-        for q in lesson['questions']:
+        for q in [q for q in lesson['questions'] if not q.get('caseId')]:
+            assert session_question(page,q)['id']==q['id']
+            if q['id']==numeric['id']:break
             answer(page,q)
             page.locator('[data-action=next-question]').click()
-            if q['id']==numeric['id']:break
-        assert any(a['questionId']==numeric['id'] and a['correct'] for a in get_state(page)['attempts'])
         # Switching topics parks unfinished drafts; they remain resumable.
         previous_id=get_state(page)['sessions']['quiz']['id']
-        page.locator('[name=numeric]').fill('77')
+        draft_numeric=str(session_question(page,numeric)['answer']).replace('.',',')
+        page.locator('[name=numeric]').fill(draft_numeric)
         page.goto(url+'/#practice');page.locator('[data-action=start-practice][data-id=L02]').click()
         assert previous_id in get_state(page)['sessions']['saved']
         page.goto(url+'/#practice');page.locator(f'[data-action=resume-saved][data-id="{previous_id}"]').click()
-        assert page.locator('[name=numeric]').input_value()=='77'
+        assert page.locator('[name=numeric]').input_value()==draft_numeric
+        answer(page,numeric)
+        assert get_state(page)['attempts'][-1]['correct']
         # Export/import roundtrip through actual controls.
         page.goto(url+'/#settings')
         with page.expect_download() as result:page.locator('[data-action=export]').click()
@@ -169,10 +243,26 @@ def run():
         page.reload(wait_until='networkidle')
         assert page.locator('textarea').first.input_value()==draft
         page.locator('textarea').first.fill('Offline ответ сохраняется без API и без сервера.')
+        assert page.evaluate("fetch('study.js').then(r=>r.ok)")
+        page.goto(url+'/#lesson?id=L01&step=lab');page.reload(wait_until='networkidle')
+        assert page.locator('.data-table').count()==1
+        page.goto(url+'/#practice');page.locator('[data-action=start-case][data-id=L06]').click()
+        offline_question=get_state(page)['sessions']['quiz']['questionIds'][0]
+        assert page.locator('.case-context .data-table').count()==1
+        answer(page,offline_question)
+        page.reload(wait_until='networkidle')
+        assert get_state(page)['attempts'][-1]['questionId']==offline_question
+        assert 'Верный ответ:' not in page.locator('#main').inner_text()
         context.set_offline(False)
+        page.goto(url+'/#lesson?id=L01&step=recall')
         page.reload(wait_until='networkidle')
         assert 'Offline ответ' in page.locator('textarea').first.input_value()
         # Phone: navigation, keyboard controls and all important pages fit the viewport.
+        page.set_viewport_size({'width':375,'height':844})
+        for lesson_id in ['L15','L21']:
+            page.goto(url+'/#lesson?id='+lesson_id+'&step=lab')
+            assert page.locator('.data-table').count()==1 and page.locator('.data-chart svg').count()==1
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+1'),lesson_id
         page.set_viewport_size({'width':390,'height':844})
         for route in ['today','route','week?id=L01','progress','lessons','lesson?id=L08','lesson?id=L01&step=artifact','practice','review','exams','experience','settings']:
             page.goto(url+'/#'+route)
@@ -191,6 +281,36 @@ def run():
         unexpected=[u for u in external if urlparse(u).hostname!='gc.kis.v2.scr.kaspersky-labs.com']
         assert not unexpected,[urlparse(u).hostname for u in unexpected]
         if external:print('Environment: observed Kaspersky-injected requests; application-origin external requests: 0.',flush=True)
+        # A real v2 snapshot remains answerable after the v3 content update.
+        old_question=json.loads((ROOT/'tests/fixtures/q01-v2.json').read_text(encoding='utf-8'))
+        previous=browser.new_context();vp=previous.new_page();vp.goto(url,wait_until='networkidle')
+        vp.evaluate('''({key,q})=>{
+          const s=PMPCore.createState(),at=new Date().toISOString();s.onboarding=true;s.completedLessons=['L01'];
+          s.lessonWork.L01={fields:{'recall-0':'Старое объяснение ученика','plan-foundation-all-challenge-done':at,'plan-foundation-all-challengenote':'Старая самостоятельная работа'},revealed:[]};
+          s.sessions.quiz={id:'v2-session',kind:'lesson',lessonId:'L01',questionIds:[q.id],questionSnapshots:{[q.id]:q},index:0,startedAt:at,deadline:'',draftAnswers:{[q.id]:q.correct},confidence:{[q.id]:3},assisted:{},started:{[q.id]:at},previouslySeen:{[q.id]:false},responseIds:[],finished:false};
+          s.exposures=[{id:q.scenarioFamilyId,questionId:q.id,at}];localStorage.setItem(key,JSON.stringify(s));
+        }''',{'key':KEY,'q':old_question})
+        vp.reload(wait_until='networkidle');vp.goto(url+'/#practice?session=active')
+        assert vp.get_by_role('heading',name=old_question['prompt'],exact=True).is_visible()
+        assert session_question(vp,old_question)['options']==old_question['options']
+        answer(vp,old_question)
+        assert get_state(vp)['attempts'][-1]['questionVersion']==2 and get_state(vp)['attempts'][-1]['correct']
+        vp.goto(url+'/#lesson?id=L01&step=lab')
+        assert 'L01' in get_state(vp)['completedLessons']
+        assert get_state(vp)['lessonWork']['L01']['fields']['recall-0']=='Старое объяснение ученика'
+        assert not get_state(vp)['lessonWork']['L01']['fields'].get('lab-v3-done')
+        vp.goto(url+'/#practice');vp.locator('[data-action=start-practice][data-id=L01]').click()
+        answer(vp,CONTENT[0]['questions'][0]);latest=get_state(vp)['attempts'][-1]
+        assert latest['questionVersion']==3 and latest['priorExposure']
+        # Very old v2 drafts without snapshots are preserved, but cannot use a new key.
+        vp.evaluate('''({key,q})=>{const s=JSON.parse(localStorage.getItem(key)),at=new Date().toISOString();
+          s.sessions.quiz={id:'missing-snapshot',kind:'lesson',lessonId:'L01',questionIds:[q.id],index:0,startedAt:at,deadline:'',draftAnswers:{[q.id]:[0]},confidence:{},assisted:{},started:{[q.id]:at},responseIds:[],finished:false};
+          localStorage.setItem(key,JSON.stringify(s));}''',{'key':KEY,'q':old_question})
+        vp.reload(wait_until='networkidle');vp.goto(url+'/#practice?session=active')
+        assert vp.get_by_role('heading',name='Для этого вопроса не сохранился снимок',exact=True).is_visible()
+        assert get_state(vp)['sessions']['quiz']['draftAnswers'][old_question['id']]==[0]
+        assert vp.locator('#answerForm').count()==0
+        previous.close()
         # Migration in a separate browser context; never touches a real learner's profile.
         legacy=browser.new_context()
         legacy.add_init_script("""if(!localStorage.getItem('pmp-study-hub-state-v1'))localStorage.setItem('pmp-study-hub-state-v1',JSON.stringify({profile:{name:'Прежний ученик',education:'unknown',hours:5,language:'ru',examDate:''},onboarding:true,settings:{mode:'foundation'},attempts:{'Q01-1':{correct:true}},completedLessons:['L01'],reviews:{},journal:[{at:1789732800000,note:'Старая запись'}],experience:[]}));""")

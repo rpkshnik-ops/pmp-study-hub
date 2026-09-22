@@ -5,7 +5,7 @@ import re
 import argparse
 
 ROOT=Path(__file__).resolve().parent.parent
-ASSETS=['index.html','styles.css','config.js','core.js','learning.js','app.js','icon.svg','manifest.webmanifest']+[f'content/pack-{i:02}.json' for i in range(1,7)]
+ASSETS=['index.html','styles.css','config.js','core.js','learning.js','study.js','app.js','icon.svg','manifest.webmanifest']+[f'content/pack-{i:02}.json' for i in range(1,7)]
 
 def release_id():
     digest=hashlib.sha256()

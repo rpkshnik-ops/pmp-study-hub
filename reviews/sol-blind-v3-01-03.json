@@ -1,0 +1,1114 @@
+{
+  "reviewer": "/root/sol_remediate_advanced",
+  "reviewModel": "gpt-5.6-sol (high)",
+  "reviewDate": "2026-09-22",
+  "stage": "blind answers before key access",
+  "blind": true,
+  "answersCreatedBeforeKeyAccess": true,
+  "responseCount": 96,
+  "ambiguities": [
+    {
+      "id": "Q05-4",
+      "note": "Option 2 is a relevant assumption worth recording as a risk, but it is not a sound estimating condition without a trial exchange; selected the three stronger conditions."
+    },
+    {
+      "id": "Q06-3",
+      "note": "Several other options are valid follow-up actions; option 0 most directly identifies what is wrong with deleting the dependency."
+    },
+    {
+      "id": "Q10-5",
+      "note": "The prompt asks when escalation is justified; selected documented impact and request for decision rather than automatic escalation after one missed response."
+    }
+  ],
+  "sourceFile": "C:\\Users\\User\\AppData\\Local\\Temp\\pmp-blind-v3-01-03.json",
+  "inputSha256LF": {
+    "pack-01.json": "df6aa89a5f7c98e942c0384e5d0cb4b1ac43eeed698f737a7432c9b5e587c8f3",
+    "pack-02.json": "af237aa464ea2b0194dc09403b2bf8ce6318de3e8a53acdb30c87b05efe96f7f",
+    "pack-03.json": "fecec67f6e1f4f55021425912e6a6d396aa6670134fb625e215cf347e48bb793"
+  },
+  "responses": [
+    {
+      "id": "Q01-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Новый механизм — проект; ежедневные исправления — операции",
+      "rationale": "A temporary effort creates and hands over a unique mechanism; recurring tariff correction is operations.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-2",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Доля онлайн-записи выросла до 60%",
+      "rationale": "A measured increase in use is an observed behavior outcome; the site is an output and future waiting reduction is a benefit forecast.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-3",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "selected": "Сопоставимый период и источник данных после запуска; Базовая доля ручных исправлений до пилота; Назначенный владелец измерения после передачи",
+      "rationale": "A causal benefit hypothesis needs a baseline, comparable post-launch data, and an owner for measurement.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-4",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "selected": "Приложение заказа принято школой -> Поставка; Ученики заранее выбирают обед -> Изменение в работе; Доля выброшенных порций снизилась -> Польза",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Приложение заказа принято школой -> Поставка; Ученики заранее выбирают обед -> Изменение в работе; Доля выброшенных порций снизилась -> Польза",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-5",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Проверить оба изменения и ограничить причинный вывод",
+      "rationale": "The concurrent call-center hours change is a confounder, so attribution must be limited and investigated.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-6",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "A: ранняя проверка поведения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: A: ранняя проверка поведения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-7",
+      "type": "numeric",
+      "answer": 25,
+      "selected": "25 %",
+      "rationale": "(40-30)/40*100 = 25%.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q01-8",
+      "type": "multi",
+      "answer": [
+        1,
+        2
+      ],
+      "selected": "Базовый уровень и сопоставимая целевая группа; Порог результата и дата решения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Базовый уровень и сопоставимая целевая группа; Порог результата и дата решения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-1",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "selected": "Утвердить дополнительные средства сверх порога -> Спонсор или уполномоченный орган; Упорядочить функции Product Backlog -> Product Owner; Свести план зависимостей и сообщить прогноз -> Руководитель проекта",
+      "rationale": "Funding above threshold belongs to sponsor/governance, backlog ordering to Product Owner, and integrated dependency forecast to PM.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-2",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Гибрид: итерации функций и фиксированный допуск данных",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Гибрид: итерации функций и фиксированный допуск данных",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-3",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Разделить статусы и показать влияние",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Разделить статусы и показать влияние",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-4",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "selected": "Цена изменения требований после изготовления оборудования; Наличие обязательной даты допуска по безопасности; Можно ли получить обратную связь посетителей до полного запуска",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Цена изменения требований после изготовления оборудования; Наличие обязательной даты допуска по безопасности; Можно ли получить обратную связь посетителей до полного запуска",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Сопоставить ценность и последствия, а бюджет передать уполномоченному",
+      "rationale": "Product value and displaced work must be compared; budget authority remains with the authorized governance role.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-6",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Согласовать загрузку и разрешение конфликтов ресурсов",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Согласовать загрузку и разрешение конфликтов ресурсов",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-7",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "selected": "Пороги стоимости и срока; Права решения и путь эскалации; Обязательные доказательства к контрольной точке",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Пороги стоимости и срока; Права решения и путь эскалации; Обязательные доказательства к контрольной точке",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q02-8",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Орган governance после переоценки",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Орган governance после переоценки",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-1",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Проверить реальные исключения с ночной сменой",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Проверить реальные исключения с ночной сменой",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-2",
+      "type": "multi",
+      "answer": [
+        0,
+        1,
+        3
+      ],
+      "selected": "Водителей и диспетчеров; Пассажиров у новой остановки; Службу информирования пассажиров",
+      "rationale": "The initial register should include affected operators, passengers, and the communication service; limiting it to decision makers omits affected stakeholders.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-3",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Зафиксировать пробел данных и согласовать решение ночного сценария",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Зафиксировать пробел данных и согласовать решение ночного сценария",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Позиция неизвестна; проверить получение и запросить отзыв",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Позиция неизвестна; проверить получение и запросить отзыв",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-5",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Сравнить критерии на общем сценарии и согласовать путь решения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Сравнить критерии на общем сценарии и согласовать путь решения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-6",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Ночной сценарий исключения не проверен",
+      "rationale": "The untested night exception is the clearest mismatch between an assumed shared solution and actual evidence.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-7",
+      "type": "multi",
+      "answer": [
+        1,
+        3
+      ],
+      "selected": "Провести ночной сценарий и измерить время исключения; Проверить причину двух записей без ID с безопасностью",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Провести ночной сценарий и измерить время исключения; Проверить причину двух записей без ID с безопасностью",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q03-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Порог ожидания пройден; безопасность и ночной сценарий открыты",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Порог ожидания пройден; безопасность и ночной сценарий открыты",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-1",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Задать сценарий, правило, исключение и измеримый порог",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Задать сценарий, правило, исключение и измеримый порог",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "selected": "Доступы и приватность проверены; Назначена поддержка после выпуска; Сотрудники смен обучены обработке исключений",
+      "rationale": "Launch readiness includes access/privacy, operational support, and training for exceptions; a button criterion is only one feature check.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-3",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Оценить влияние на тарифы, проверки и срок; вынести варианты",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Оценить влияние на тарифы, проверки и срок; вынести варианты",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-4",
+      "type": "matching",
+      "answer": [
+        2,
+        0,
+        1
+      ],
+      "selected": "Читатель может зарезервировать доступную книгу -> Требование; При тесте книга с нулевым остатком не резервируется -> Критерий приёмки; Межбиблиотечный обмен не входит в первую волну -> Исключение из объёма",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Читатель может зарезервировать доступную книгу -> Требование; При тесте книга с нулевым остатком не резервируется -> Критерий приёмки; Межбиблиотечный обмен не входит в первую волну -> Исключение из объёма",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-5",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Проверить как дефект относительно принятого критерия и исправить по процессу качества",
+      "rationale": "Observed behavior violates an already accepted criterion, so it is a defect rather than an unevaluated change.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Нужен повтор T-44 на согласованных данных новой версии",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Нужен повтор T-44 на согласованных данных новой версии",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-7",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "selected": "Операционная инструкция обработки сбоя; Критерий корректности суммы и валюты; Интеграционный тест и тест аудита",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Операционная инструкция обработки сбоя; Критерий корректности суммы и валюты; Интеграционный тест и тест аудита",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q04-8",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Тест пройден; бизнес-приёмка открыта до решения владельца",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Тест пройден; бизнес-приёмка открыта до решения владельца",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Полнота декомпозиции результата",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Полнота декомпозиции результата",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-2",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Применить аналог к сходной части и отдельно оценить отличие",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Применить аналог к сходной части и отдельно оценить отличие",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-3",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Усилия не равны длительности при зависимостях",
+      "rationale": "Effort cannot be divided by headcount without checking dependencies, indivisible work, calendars, and coordination.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-4",
+      "type": "multi",
+      "answer": [
+        0,
+        1,
+        3
+      ],
+      "selected": "Дата получения спецификации ошибок; Доступность тестовой среды партнёра; Диапазон труда на обработку отказов",
+      "rationale": "Specification timing, partner test environment, and failure-handling effort materially condition the estimate. The certificate-only compatibility assumption is weak and should be treated as risk rather than accepted evidence.",
+      "uncertainty": "medium",
+      "uncertaintyNote": "Option 2 is a relevant assumption worth recording as a risk, but it is not a sound estimating condition without a trial exchange; selected the three stronger conditions."
+    },
+    {
+      "id": "Q05-5",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "selected": "Разбить выпуск на проверяемые части -> Декомпозиция; Сравнить с прошлым порталом и назвать отличия -> Оценка по аналогии; Указать «при готовой базе учеников» -> Допущение",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Разбить выпуск на проверяемые части -> Декомпозиция; Сравнить с прошлым порталом и назвать отличия -> Оценка по аналогии; Указать «при готовой базе учеников» -> Допущение",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-6",
+      "type": "numeric",
+      "answer": 8,
+      "selected": "8 человеко-дней",
+      "rationale": "PERT = (4 + 4*7 + 16)/6 = 48/6 = 8 person-days.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-7",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Общая задержка связывает оценки",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Общая задержка связывает оценки",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q05-8",
+      "type": "multi",
+      "answer": [
+        0,
+        1
+      ],
+      "selected": "Диапазон и причины крайних значений; Условие пересмотра при новой информации",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Диапазон и причины крайних значений; Условие пересмотра при новой информации",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-1",
+      "type": "numeric",
+      "answer": 9,
+      "selected": "9 рабочих дней",
+      "rationale": "A + max(B,C) + D = 3 + max(4,2) + 2 = 9 workdays.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-2",
+      "type": "numeric",
+      "answer": 2,
+      "selected": "2 дня",
+      "rationale": "Critical branch is permit 6 days; counters finish in 4, so total float = 6-4 = 2 days before the common 2-day inspection.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-3",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Без среды тест не стартует; удаление связи искажает прогноз",
+      "rationale": "Deleting a real dependency only protects the displayed date and makes the schedule forecast false.",
+      "uncertainty": "low",
+      "uncertaintyNote": "Several other options are valid follow-up actions; option 0 most directly identifies what is wrong with deleting the dependency."
+    },
+    {
+      "id": "Q06-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Пересчитать сеть: теперь ранний финиш задаёт вторая ветвь",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Пересчитать сеть: теперь ранний финиш задаёт вторая ветвь",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-5",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "selected": "Указаны календарь и владелец ключевых вех; Найдены работы с неожиданно открытыми концами; Подтверждены внешние окна партнёра",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Указаны календарь и владелец ключевых вех; Найдены работы с неожиданно открытыми концами; Подтверждены внешние окна партнёра",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-6",
+      "type": "numeric",
+      "answer": 12,
+      "selected": "12 рабочих дней",
+      "rationale": "A-B-D-F = 2+6+3+1 = 12; A-C-D-F = 10; A-C-E-F = 9, so early finish is day 12.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-7",
+      "type": "numeric",
+      "answer": 2,
+      "selected": "2 рабочих дня",
+      "rationale": "C ES=2 EF=6. D cannot start until B ends at 8, so C may finish at 8; total float = 2 days. The E branch is less restrictive.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q06-8",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "B: сокращение на два дня, пока C не станет ограничением",
+      "rationale": "Crashing B by 2 days changes B and C to equal 6-day branches after A and reduces project duration from 12 to 10. Crashing C alone does not shorten the B-controlled path.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-1",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Добавить пропущенные пакеты и периоды, пересчитать бюджет",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Добавить пропущенные пакеты и периоды, пересчитать бюджет",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-2",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Проверить приоритет, альтернативный ресурс или последовательность и пересчитать срок и стоимость",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Проверить приоритет, альтернативный ресурс или последовательность и пересчитать срок и стоимость",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-3",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "selected": "Тест сценариев с разными валютами и неверным кодом; Повторно проверить исправленный дефект перед выпуском; Ранний обзор валютных правил с финансами",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Тест сценариев с разными валютами и неверным кодом; Повторно проверить исправленный дефект перед выпуском; Ранний обзор валютных правил с финансами",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Высокий процент не снимает критичный пробел; оценить последствия и выполнить проверку",
+      "rationale": "A high aggregate pass rate cannot override an untested safety-critical allergen scenario.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-5",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "selected": "Неделя оплаты тестовых проб -> План расходов; Окно доступности электрика -> План ресурса; Калибровка по контрольному образцу -> Проверка качества",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Неделя оплаты тестовых проб -> План расходов; Окно доступности электрика -> План ресурса; Калибровка по контрольному образцу -> Проверка качества",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-6",
+      "type": "numeric",
+      "answer": 460,
+      "selected": "460 тыс.",
+      "rationale": "CoQ = prevention 120 + appraisal 160 + expected failures 180 = 460 thousand.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Проверить платёж, договор и перенос или транш финансирования",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Проверить платёж, договор и перенос или транш финансирования",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q07-8",
+      "type": "multi",
+      "answer": [
+        2,
+        3
+      ],
+      "selected": "Resource leveling с изменением последовательности; Привлечение внешнего специалиста с проверкой компетенции и стоимости",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Resource leveling с изменением последовательности; Привлечение внешнего специалиста с проверкой компетенции и стоимости",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-1",
+      "type": "numeric",
+      "answer": 0.8,
+      "selected": "0.8 индекс",
+      "rationale": "CPI = EV/AC = 80/100 = 0.8.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-2",
+      "type": "numeric",
+      "answer": -60,
+      "selected": "-60 тыс. денежных единиц",
+      "rationale": "SV = EV-PV = 240-300 = -60 thousand.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-3",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Текущая эффективность затрат сохранится",
+      "rationale": "BAC/CPI projects the observed cumulative cost efficiency through the remaining work.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-4",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "EV и индексы ненадёжны до проверки готовности",
+      "rationale": "Without objective completion and acceptance rules, claimed percent complete cannot support credible EV.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-5",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "selected": "CV=EV−AC -> Денежная разница между выполненным бюджетом и затратами; SV=EV−PV -> Денежная разница между выполненным и плановым объёмом; SPI=EV/PV -> Доля выполненного бюджетного объёма от плана к дате",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: CV=EV−AC -> Денежная разница между выполненным бюджетом и затратами; SV=EV−PV -> Денежная разница между выполненным и плановым объёмом; SPI=EV/PV -> Доля выполненного бюджетного объёма от плана к дате",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-6",
+      "type": "numeric",
+      "answer": 1250,
+      "selected": "1250 тыс.",
+      "rationale": "CPI=400/500=0.8; EAC=1000/0.8=1250 thousand.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-7",
+      "type": "numeric",
+      "answer": 1.2,
+      "selected": "1.2 индекс",
+      "rationale": "TCPI=(1000-400)/(1000-500)=600/500=1.2.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q08-8",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "EAC = AC + (BAC − EV)",
+      "rationale": "A one-time variance is not projected into remaining work, so EAC = AC + (BAC-EV).",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Согласовать окно и приоритет, назначить заместителя",
+      "rationale": "The constraint is a priority/calendar conflict; resolve capacity and provide a qualified substitute before punitive escalation.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-2",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "selected": "Доступ к данным и ответственному за согласование; Критерий готовности и срок проверки; Решения, которые команда вправе принять",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Доступ к данным и ответственному за согласование; Критерий готовности и срок проверки; Решения, которые команда вправе принять",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-3",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Показать процедуру и критерии, оставив выбор анализа",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Показать процедуру и критерии, оставив выбор анализа",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-4",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Два звонка пропущены; схема не передана к четвергу",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Два звонка пропущены; схема не передана к четвергу",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-5",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Назначить владельца выдачи доступа и согласовать срок или путь эскалации",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Назначить владельца выдачи доступа и согласовать срок или путь эскалации",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-6",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Общие критерии и пересказ цели командами",
+      "rationale": "Shared criteria plus team restatement makes the common purpose observable and testable.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-7",
+      "type": "multi",
+      "answer": [
+        1,
+        2
+      ],
+      "selected": "Порог автономного решения команды; Правило замещения недоступного эксперта",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Порог автономного решения команды; Правило замещения недоступного эксперта",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q09-8",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Наставничество с практикой и отзывом",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Наставничество с практикой и отзывом",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-1",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Объём, прогноз, варианты и срок решения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Объём, прогноз, варианты и срок решения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-2",
+      "type": "multi",
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "selected": "Первый рейс фактически прошёл по новому времени; Водители подтвердили новый график; Семьи без приложения получили бумажное уведомление",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Первый рейс фактически прошёл по новому времени; Водители подтвердили новый график; Семьи без приложения получили бумажное уведомление",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-3",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Обновить записи и подтвердить понимание смен",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Обновить записи и подтвердить понимание смен",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-4",
+      "type": "matching",
+      "answer": [
+        2,
+        1,
+        0
+      ],
+      "selected": "Совет проекта -> Прогноз, варианты и срок решения; Техническая группа -> Воспроизводимые данные дефекта; Дежурная смена -> Новый рабочий порядок и исключения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Совет проекта -> Прогноз, варианты и срок решения; Техническая группа -> Воспроизводимые данные дефекта; Дежурная смена -> Новый рабочий порядок и исключения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Зафиксировать влияние; запросить решение",
+      "rationale": "Escalation is justified by documented impact and an imminent safe-test window using the defined decision route.",
+      "uncertainty": "low",
+      "uncertaintyNote": "The prompt asks when escalation is justified; selected documented impact and request for decision rather than automatic escalation after one missed response."
+    },
+    {
+      "id": "Q10-6",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Проверить понимание и действие смен",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Проверить понимание и действие смен",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-7",
+      "type": "multi",
+      "answer": [
+        0,
+        1,
+        2
+      ],
+      "selected": "Затронутый объём и evidence; Варианты с последствиями; Срок и владелец решения",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Затронутый объём и evidence; Варианты с последствиями; Срок и владелец решения",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q10-8",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Агрегировать данные и ограничить доступ",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Агрегировать данные и ограничить доступ",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-1",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Проверить скорость и аудит на общей выборке",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Проверить скорость и аудит на общей выборке",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-2",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Сохранность рукописи в допустимых условиях",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Сохранность рукописи в допустимых условиях",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-3",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "selected": "Владельцев действий и сроки; Кто утвердил решение и как проверить результат; Точные маршруты пилота и критерий допуска",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Владельцев действий и сроки; Кто утвердил решение и как проверить результат; Точные маршруты пилота и критерий допуска",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Пресечь личную оценку и вернуться к условиям решения",
+      "rationale": "Stop the personal characterization immediately and return the group to interests and decision criteria.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-5",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Уполномоченный спонсор после оценки последствий",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Уполномоченный спонсор после оценки последствий",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-6",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Скорость, ручная доля, аудит, экономия и бюджет",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Скорость, ручная доля, аудит, экономия и бюджет",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-7",
+      "type": "multi",
+      "answer": [
+        0,
+        3
+      ],
+      "selected": "Триггеры остановки при нарушении аудита или лимита ручной работы; Маршруты, владельцы, даты и критерии допуска",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Триггеры остановки при нарушении аудита или лимита ручной работы; Маршруты, владельцы, даты и критерии допуска",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q11-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Передать варианты выше порога уполномоченному органу",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Передать варианты выше порога уполномоченному органу",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-1",
+      "type": "multi",
+      "answer": [
+        0,
+        1,
+        3
+      ],
+      "selected": "Версию настройки и воспроизводимые данные; Ожидаемый и фактический результат; Владельца следующего шага и срок с часовым поясом",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Версию настройки и воспроизводимые данные; Ожидаемый и фактический результат; Владельца следующего шага и срок с часовым поясом",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-2",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "selected": "Единая утверждённая версия и владелец публикации",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Единая утверждённая версия и владелец публикации",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-3",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "«Каким тестом различишь риски этих двух вариантов и когда покажешь результат?»",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: «Каким тестом различишь риски этих двух вариантов и когда покажешь результат?»",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-4",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Смысл обсудить синхронно и записать; редактуру вести асинхронно",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Смысл обсудить синхронно и записать; редактуру вести асинхронно",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-5",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "selected": "Остановить обмен по процедуре и подключить уполномоченных",
+      "rationale": "A possible personal-data leak requires immediate procedural containment and authorized involvement, not coaching delay.",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-6",
+      "type": "multi",
+      "answer": [
+        0,
+        3
+      ],
+      "selected": "Контакт банка, известный одному человеку; Устное правило округления JPY у одного носителя",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Контакт банка, известный одному человеку; Устное правило округления JPY у одного носителя",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-7",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "selected": "Самостоятельно воспроизвести сценарий и объяснить решение",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Самостоятельно воспроизвести сценарий и объяснить решение",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    },
+    {
+      "id": "Q12-8",
+      "type": "single",
+      "answer": [
+        3
+      ],
+      "selected": "Доля передач, возвращённых за уточнением",
+      "rationale": "Independent selection based on role, sequence, evidence, and stated constraints: Доля передач, возвращённых за уточнением",
+      "uncertainty": "none",
+      "uncertaintyNote": ""
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "contentVersion": "2026.3",
+  "reviewDate": "2026-09-22",
+  "method": "Cross-review by separate Sol sessions; hashes recorded after reviewer corrections. Supplemental blind check: reviews/sol-check-v3-Q24-3.md. No expert or psychometric validation.",
+  "packs": {
+    "content/pack-01.json": {
+      "sha256LF": "294b5f36974fd0bc8eeb3e29eaee2a582bcc2744b36e105e575b19f2cc6b8069",
+      "report": "reviews/sol-review-v3-01-03.md",
+      "blindAnswers": "reviews/sol-blind-v3-01-03.json"
+    },
+    "content/pack-02.json": {
+      "sha256LF": "01af1bbab62b82de1b1654d1d097096cf17443d9171ef280645a392fb21a9924",
+      "report": "reviews/sol-review-v3-01-03.md",
+      "blindAnswers": "reviews/sol-blind-v3-01-03.json"
+    },
+    "content/pack-03.json": {
+      "sha256LF": "0c8bb3e1df7ca1a970ef062fddd64431949d65bfc14ce97c91a297c93e856084",
+      "report": "reviews/sol-review-v3-01-03.md",
+      "blindAnswers": "reviews/sol-blind-v3-01-03.json"
+    },
+    "content/pack-04.json": {
+      "sha256LF": "0c80f85628e15b2d167982eb336b8a4e67c4387493e54a862d67a2a29b4b4be6",
+      "report": "reviews/sol-review-v3-04-06.md",
+      "blindAnswers": "reviews/sol-blind-v3-04-06.json"
+    },
+    "content/pack-05.json": {
+      "sha256LF": "5e8627d0f06fa10f0f5b024f842b2feec89cfdbf7f37a8a9f7a009b40887c16b",
+      "report": "reviews/sol-review-v3-04-06.md",
+      "blindAnswers": "reviews/sol-blind-v3-04-06.json"
+    },
+    "content/pack-06.json": {
+      "sha256LF": "21c6f00b943f0b163ac4f43ad405db55feeaf09c6dc7a52f2d58a69b6a2fbcb7",
+      "report": "reviews/sol-review-v3-04-06.md",
+      "blindAnswers": "reviews/sol-blind-v3-04-06.json"
+    }
+  }
+}

@@ -1,0 +1,1286 @@
+{
+  "reviewer": "Codex /root/sol_remediate_foundation",
+  "reviewModel": "gpt-5.6-sol (high)",
+  "reviewDate": "2026-09-22",
+  "stage": "blind answers before key access",
+  "blind": true,
+  "answersCreatedBeforeKeyAccess": true,
+  "sourceFile": "C:\\Users\\User\\AppData\\Local\\Temp\\pmp-blind-v3-04-06.json",
+  "inputSha256LF": {
+    "pack-04.json": "15fd4985fd8bbda050aa9b02a70484d70e28573445350406af297eb7dce87a81",
+    "pack-05.json": "dcf9c414871edd95548483093e46950a674341e1fe99db441079255bd9001373",
+    "pack-06.json": "319124aa9b7a94acbd26b66192b95ca48d38319c75bdc41fece3034c1ae6a8bf"
+  },
+  "responseCount": 96,
+  "ambiguities": [
+    {
+      "id": "Q15-1",
+      "note": "Cycle time may be reported inclusively in some informal teams; wording 'прошедшего времени' supports 14-day elapsed difference."
+    },
+    {
+      "id": "Q17-1",
+      "note": "Option calls both values EMV; I interpret the response branch as response cost plus residual exposure, otherwise option 2 would omit response cost."
+    },
+    {
+      "id": "Q16-6",
+      "note": "The 56–70 day answer assumes the word 'затем' means the 28-day external test starts after the 2–3 Sprints and that no calendar conversion beyond 14-day Sprints is needed."
+    },
+    {
+      "id": "Q23-6",
+      "note": "Warehouse A is only a candidate: 24/25 UAT and the shared contractual milestone still require evidence and authorized change, which the option states conditionally."
+    }
+  ],
+  "responses": [
+    {
+      "id": "Q13-1",
+      "type": "matching",
+      "answer": [
+        2,
+        1,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Product Backlog",
+          "right": "Product Goal"
+        },
+        {
+          "left": "Sprint Backlog",
+          "right": "Sprint Goal"
+        },
+        {
+          "left": "Increment",
+          "right": "Definition of Done"
+        }
+      ]
+    },
+    {
+      "id": "Q13-2",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Product Owner рассматривает отмену Sprint"
+      ]
+    },
+    {
+      "id": "Q13-3",
+      "type": "multi",
+      "answer": [
+        1,
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Оспорить давление снизить DoD и предложить варианты объёма",
+        "Сообщить, что интеграционный тест не пройден, и показать отдельно готовый Increment"
+      ]
+    },
+    {
+      "id": "Q13-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Разбить работу, уточнить критерии и переоценить"
+      ]
+    },
+    {
+      "id": "Q13-5",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Вернуть Daily Scrum к плану относительно Sprint Goal"
+      ]
+    },
+    {
+      "id": "Q13-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Совместно пересогласовать Sprint Backlog вокруг прежнего Goal"
+      ]
+    },
+    {
+      "id": "Q13-7",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Достаточные критерии и выявленные зависимости",
+        "Размер, который команда готова обсуждать при Sprint Planning",
+        "Единое понимание ценности и границ элемента"
+      ]
+    },
+    {
+      "id": "Q13-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "medium",
+      "selectedOptionText": [
+        "Проверять values через наблюдаемые командные эксперименты"
+      ]
+    },
+    {
+      "id": "Q14-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Прогнозировать очереди отдельно и календарно связать зависимости"
+      ]
+    },
+    {
+      "id": "Q14-2",
+      "type": "multi",
+      "answer": [
+        1,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Общий scope вырос на 30 points после обязательного требования",
+        "Критическая интеграция доступна только через шесть недель"
+      ]
+    },
+    {
+      "id": "Q14-3",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Диапазон 3–6 Sprint с регулярным обновлением"
+      ],
+      "calculationOrNote": "Velocity 10–20 даёт ceil(54/20)=3 и ceil(54/10)=6 Sprint; это эмпирический диапазон, не обещание."
+    },
+    {
+      "id": "Q14-4",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Скрыта причина расхождения оценок",
+          "right": "Planning Poker"
+        },
+        {
+          "left": "Меняется общий scope релиза",
+          "right": "Burnup chart"
+        },
+        {
+          "left": "Нужно проверить критерии до разработки",
+          "right": "Example mapping"
+        }
+      ]
+    },
+    {
+      "id": "Q14-5",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Удалялся ли scope и как это отражено в прогнозе"
+      ]
+    },
+    {
+      "id": "Q14-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Разделить ценность, исследование и внешнюю зависимость"
+      ]
+    },
+    {
+      "id": "Q14-7",
+      "type": "numeric",
+      "answer": 5,
+      "confidence": "high",
+      "unit": "Sprint",
+      "calculationOrNote": "ceil(80/18)=ceil(4,44)=5 полных Sprint."
+    },
+    {
+      "id": "Q14-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Показать диапазон, допущения и даты обновления"
+      ]
+    },
+    {
+      "id": "Q15-1",
+      "type": "numeric",
+      "answer": 14,
+      "confidence": "medium",
+      "unit": "дней",
+      "calculationOrNote": "Elapsed time: 17 марта минус 3 марта = 14 календарных дней. При включительном подсчёте обеих дат было бы 15, но prompt явно задаёт прошедшее время."
+    },
+    {
+      "id": "Q15-2",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Помочь снять блокировки в тестировании"
+      ]
+    },
+    {
+      "id": "Q15-3",
+      "type": "matching",
+      "answer": [
+        1,
+        3,
+        2,
+        4
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Сколько элементов завершено за неделю?",
+          "right": "Throughput"
+        },
+        {
+          "left": "Сколько элементов сейчас начато?",
+          "right": "WIP"
+        },
+        {
+          "left": "Сколько прошло от старта до финиша?",
+          "right": "Cycle time"
+        },
+        {
+          "left": "Сколько прошло от запроса до поставки?",
+          "right": "Lead time"
+        }
+      ]
+    },
+    {
+      "id": "Q15-4",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверка влияния на обещания обычной очереди",
+        "Явный критерий действительно срочного класса",
+        "Ограничение числа expedite элементов"
+      ]
+    },
+    {
+      "id": "Q15-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Около 85% сопоставимых элементов — не более 12 дней"
+      ]
+    },
+    {
+      "id": "Q15-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить блокировки недели 3 до запуска новой работы"
+      ]
+    },
+    {
+      "id": "Q15-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "4–6 недель"
+      ],
+      "calculationOrNote": "ceil(28/9)=4 и ceil(28/5)=6 недель."
+    },
+    {
+      "id": "Q15-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить классы работы и хвост распределения"
+      ]
+    },
+    {
+      "id": "Q16-1",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Разделить потоки и связать их едиными release gates"
+      ]
+    },
+    {
+      "id": "Q16-2",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Упорядочить Product Backlog",
+          "right": "Product Owner"
+        },
+        {
+          "left": "Разрешить внешний сертификат",
+          "right": "Регуляторный орган"
+        },
+        {
+          "left": "Одобрить изменение cost baseline",
+          "right": "Change authority/CCB"
+        }
+      ]
+    },
+    {
+      "id": "Q16-3",
+      "type": "multi",
+      "answer": [
+        1,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Любое уточнение backlog требует CCB, хотя baseline не меняется",
+        "Один статус вручную копируется в три системы и расходится"
+      ]
+    },
+    {
+      "id": "Q16-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Показать evidence потоков, зависимости и release criteria"
+      ]
+    },
+    {
+      "id": "Q16-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Вернуть нужный контроль и повторно измерить обе метрики"
+      ]
+    },
+    {
+      "id": "Q16-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "medium",
+      "selectedOptionText": [
+        "56–70 дней"
+      ],
+      "calculationOrNote": "36 points при velocity 18–12 требуют 2–3 двухнедельных Sprint, то есть 28–42 дня; последовательный внешний тест ещё 28 дней даёт 56–70."
+    },
+    {
+      "id": "Q16-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Собрать impact evidence и применить release criteria"
+      ]
+    },
+    {
+      "id": "Q16-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Оценить capacity, privacy и support и направить change"
+      ]
+    },
+    {
+      "id": "Q17-1",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "medium",
+      "selectedOptionText": [
+        "EMV обоих вариантов — 180 тыс. ₽"
+      ],
+      "calculationOrNote": "Без ответа 0,30×600=180 тыс.; с ответом 120+0,10×600=180 тыс. Полные ожидаемые стоимости равны."
+    },
+    {
+      "id": "Q17-2",
+      "type": "multi",
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Trigger с источником наблюдения и порогом",
+        "Risk owner и action owner с понятными полномочиями",
+        "Ожидаемый эффект ответа и способ его проверить"
+      ]
+    },
+    {
+      "id": "Q17-3",
+      "type": "matching",
+      "answer": [
+        2,
+        3,
+        1,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Risk appetite",
+          "right": "Общий уровень неопределённости, который организация готова принять"
+        },
+        {
+          "left": "Tolerance",
+          "right": "Допустимый диапазон отклонения"
+        },
+        {
+          "left": "Threshold",
+          "right": "Конкретная граница, запускающая действие"
+        },
+        {
+          "left": "Aggregate project risk",
+          "right": "Совокупное влияние неопределённости на проект"
+        }
+      ]
+    },
+    {
+      "id": "Q17-4",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сложение может занизить риск из-за корреляции"
+      ]
+    },
+    {
+      "id": "Q17-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Первый — contingency reserve, второй — management reserve"
+      ]
+    },
+    {
+      "id": "Q17-6",
+      "type": "numeric",
+      "answer": 225,
+      "confidence": "high",
+      "unit": "тыс. ₽",
+      "calculationOrNote": "0,30×600 + 0,15×300 = 180+45=225 тыс. ₽."
+    },
+    {
+      "id": "Q17-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Обновить residual и зарегистрировать secondary risk"
+      ]
+    },
+    {
+      "id": "Q17-8",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить допущения и механизм ответов"
+      ]
+    },
+    {
+      "id": "Q18-1",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Fixed price для hardware; capped T&M для software"
+      ]
+    },
+    {
+      "id": "Q18-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверенный exit plan с ценой и сроком перехода",
+        "Права на экспорт данных в открытом формате"
+      ]
+    },
+    {
+      "id": "Q18-3",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Procurement SOW",
+          "right": "Описать требуемый результат и критерии приёмки"
+        },
+        {
+          "left": "RFP",
+          "right": "Получить подход и коммерческое предложение поставщика"
+        },
+        {
+          "left": "Source selection plan",
+          "right": "Заранее определить веса, минимумы и правила оценки"
+        }
+      ]
+    },
+    {
+      "id": "Q18-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "medium",
+      "selectedOptionText": [
+        "Проверить существенность и правила повторного выбора"
+      ]
+    },
+    {
+      "id": "Q18-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сверить milestones и закрыть открытые обязательства"
+      ]
+    },
+    {
+      "id": "Q18-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Применить partial-payment rule или authorized change"
+      ]
+    },
+    {
+      "id": "Q18-7",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Зафиксировать fail и применить согласованный retest"
+      ]
+    },
+    {
+      "id": "Q18-8",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "SOW, версии, уведомления и evidence затрат"
+      ]
+    },
+    {
+      "id": "Q19-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Есть adoption gap: исследовать барьеры и reinforcement"
+      ]
+    },
+    {
+      "id": "Q19-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Local champions с каналом обратной связи",
+        "Метрики целевого поведения и действия при отклонении",
+        "Sponsor coalition для межфункциональных препятствий"
+      ]
+    },
+    {
+      "id": "Q19-3",
+      "type": "matching",
+      "answer": [
+        2,
+        1,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Функция доступна пользователю",
+          "right": "Delivery/output"
+        },
+        {
+          "left": "Доля заявок по новому процессу",
+          "right": "Adoption behavior"
+        },
+        {
+          "left": "Сокращение времени закупки",
+          "right": "Business benefit"
+        }
+      ]
+    },
+    {
+      "id": "Q19-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Снять барьеры прав и capacity, затем пилотировать"
+      ]
+    },
+    {
+      "id": "Q19-5",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Исправить конфликт KPI вместе с process owner"
+      ]
+    },
+    {
+      "id": "Q19-6",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить baseline, lag и bottleneck экспериментом"
+      ]
+    },
+    {
+      "id": "Q19-7",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Согласовать один источник и нужные представления статуса"
+      ]
+    },
+    {
+      "id": "Q19-8",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Усилить leader routines, feedback и метрики обходов"
+      ]
+    },
+    {
+      "id": "Q20-1",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить источник и applicability, затем оценить impact"
+      ]
+    },
+    {
+      "id": "Q20-2",
+      "type": "multi",
+      "answer": [
+        1,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Черновая группировка обезличенных рисков с проверкой по risk register",
+        "Черновое резюме разрешённой встречи с ссылками на transcript"
+      ]
+    },
+    {
+      "id": "Q20-3",
+      "type": "matching",
+      "answer": [
+        2,
+        1,
+        0,
+        3
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "GOVERN",
+          "right": "Назначить accountability и policy"
+        },
+        {
+          "left": "MAP",
+          "right": "Определить контекст, людей и последствия"
+        },
+        {
+          "left": "MEASURE",
+          "right": "Оценить качество и bias на тестовом наборе"
+        },
+        {
+          "left": "MANAGE",
+          "right": "Приоритизировать response и monitor"
+        }
+      ]
+    },
+    {
+      "id": "Q20-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Обновить business case и сравнить четыре варианта"
+      ]
+    },
+    {
+      "id": "Q20-5",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Остановить применение и повторно валидировать версию"
+      ]
+    },
+    {
+      "id": "Q20-6",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сравнить lifecycle cost, thresholds и социальный риск"
+      ]
+    },
+    {
+      "id": "Q20-7",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сравнить три сценария перехода с costs и risks"
+      ]
+    },
+    {
+      "id": "Q20-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Входы, версия, проверяющий и исправления выводов"
+      ]
+    },
+    {
+      "id": "Q21-1",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "800 тыс. ₽"
+      ],
+      "calculationOrNote": "200+100+80+420=800 тыс. ₽."
+    },
+    {
+      "id": "Q21-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Обучить операторов новой стандартной работе до запуска",
+        "Перепроектировать интерфейс, чтобы исключить неверную сборку"
+      ]
+    },
+    {
+      "id": "Q21-3",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Точка выше upper control limit",
+          "right": "Сигнал special cause для исследования"
+        },
+        {
+          "left": "Все точки стабильны, но среднее вне specification",
+          "right": "Стабильный, но неспособный процесс"
+        },
+        {
+          "left": "Одна выборка соответствует specification",
+          "right": "Недостаточно для вывода о стабильности процесса"
+        }
+      ]
+    },
+    {
+      "id": "Q21-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Исследовать процесс справочников и подтвердить cause"
+      ]
+    },
+    {
+      "id": "Q21-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Улучшить capability или согласованно изменить design"
+      ]
+    },
+    {
+      "id": "Q21-6",
+      "type": "numeric",
+      "answer": 1520,
+      "confidence": "high",
+      "unit": "тыс. ₽",
+      "calculationOrNote": "40×8 + 15×80 = 320+1200=1520 тыс. ₽."
+    },
+    {
+      "id": "Q21-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Снижение есть; проверить сопоставимость и иные изменения"
+      ]
+    },
+    {
+      "id": "Q21-8",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Выборка неслучайна и не представляет остальные смены"
+      ]
+    },
+    {
+      "id": "Q22-1",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Защитить работу и инвентаризировать обязательства"
+      ]
+    },
+    {
+      "id": "Q22-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2,
+        3
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Демонстрация, что support выполняет критический сценарий",
+        "Runbook, доступы, SLA и владельцы открытых рисков",
+        "Подписанные acceptance/transition criteria"
+      ]
+    },
+    {
+      "id": "Q22-3",
+      "type": "matching",
+      "answer": [
+        2,
+        3,
+        0,
+        1
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "Открытый contract claim",
+          "right": "Урегулировать по договорному процессу"
+        },
+        {
+          "left": "Неиспользованный contingency reserve",
+          "right": "Освободить уполномоченно после оценки обязательств"
+        },
+        {
+          "left": "Benefit после закрытия проекта",
+          "right": "Передать operational benefit owner с baseline"
+        },
+        {
+          "left": "Записи с legal hold",
+          "right": "Сохранить до снятия правового ограничения"
+        }
+      ]
+    },
+    {
+      "id": "Q22-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Выполнить phase closure и разрешить следующую фазу"
+      ]
+    },
+    {
+      "id": "Q22-5",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Передать открытый claim с records и owner"
+      ]
+    },
+    {
+      "id": "Q22-6",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Передать метрику, baseline, дату и benefit owner"
+      ]
+    },
+    {
+      "id": "Q22-7",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сохранить records до снятия legal hold"
+      ]
+    },
+    {
+      "id": "Q22-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Контекст, факт, эффект и применимая рекомендация"
+      ]
+    },
+    {
+      "id": "Q23-1",
+      "type": "matching",
+      "answer": [
+        1,
+        2,
+        0,
+        3
+      ],
+      "confidence": "high",
+      "mapping": [
+        {
+          "left": "UAT ниже acceptance threshold",
+          "right": "Quality and release decision"
+        },
+        {
+          "left": "Изменение contractual milestone",
+          "right": "Procurement/change control"
+        },
+        {
+          "left": "Низкий adoption при готовой системе",
+          "right": "Benefit/change owner"
+        },
+        {
+          "left": "Исчерпан contingency reserve",
+          "right": "Finance/governance decision"
+        }
+      ]
+    },
+    {
+      "id": "Q23-2",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Не готов по quality threshold до решения authority"
+      ]
+    },
+    {
+      "id": "Q23-3",
+      "type": "multi",
+      "answer": [
+        1,
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить общие интеграционные зависимости и независимость acceptance",
+        "Получить authorized contract/baseline change"
+      ]
+    },
+    {
+      "id": "Q23-4",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Обновить benefit forecast после анализа причин"
+      ]
+    },
+    {
+      "id": "Q23-5",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Потратить 0,9 млн, потому что арифметически резерва хватает"
+      ]
+    },
+    {
+      "id": "Q23-6",
+      "type": "single",
+      "answer": [
+        0
+      ],
+      "confidence": "medium",
+      "selectedOptionText": [
+        "Склад A при разрешённых зависимостях и change"
+      ]
+    },
+    {
+      "id": "Q23-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Остановить migration и пересмотреть split release"
+      ]
+    },
+    {
+      "id": "Q23-8",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Сегментировать барьеры и обновить benefit forecast"
+      ]
+    },
+    {
+      "id": "Q24-1",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Ответ экономически лучше на 0,2 млн ₽"
+      ],
+      "calculationOrNote": "Без ответа 0,20×5=1,0 млн; с ответом 0,4+0,08×5=0,8 млн; экономическое преимущество ответа 0,2 млн."
+    },
+    {
+      "id": "Q24-2",
+      "type": "multi",
+      "answer": [
+        0,
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Исправить причины и провести согласованный retest",
+        "Зафиксировать непройденный критерий и распределение ошибок"
+      ]
+    },
+    {
+      "id": "Q24-3",
+      "type": "numeric",
+      "answer": 0.8,
+      "confidence": "high",
+      "unit": "млн ₽",
+      "calculationOrNote": "0,4+0,08×5=0,8 млн ₽."
+    },
+    {
+      "id": "Q24-4",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Contract/SOW, change versions, notices и cost evidence"
+      ]
+    },
+    {
+      "id": "Q24-5",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Проверить readiness barriers и назначить reinforcement"
+      ]
+    },
+    {
+      "id": "Q24-6",
+      "type": "single",
+      "answer": [
+        2
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Governance change authority в пределах полномочий"
+      ]
+    },
+    {
+      "id": "Q24-7",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Исследовать special cause при сохранении specification"
+      ]
+    },
+    {
+      "id": "Q24-8",
+      "type": "single",
+      "answer": [
+        1
+      ],
+      "confidence": "high",
+      "selectedOptionText": [
+        "Защитить asset и передать обязательства уполномоченно"
+      ]
+    }
+  ]
+}

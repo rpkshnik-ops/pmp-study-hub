@@ -61,6 +61,7 @@
       answeredAt: text(a.answeredAt, 'дата ответа', 100), elapsedSeconds: num(a.elapsedSeconds, 'время ответа', 0, 86400) };
     if (a.priorExposure !== undefined && typeof a.priorExposure !== 'boolean') fail('Некорректная предыдущая попытка');
     x.priorExposure = a.priorExposure === true;
+    if (a.sessionId !== undefined) x.sessionId = id(a.sessionId, 'сессия попытки');
     return x;
   }
   function normalizeRecordList(v, name) { return arr(v, name).map(function (x) { if (!plain(x)) fail('Некорректная запись: ' + name); return safe(x, 0); }); }
@@ -72,6 +73,7 @@
   }
   function quizSnapshot(snapshot, questionId) {
     if (!plain(snapshot) || id(snapshot.id, 'снимок вопроса') !== questionId || !text(snapshot.prompt, 'вопрос снимка') || !['single','multi','numeric','matching'].includes(snapshot.type) || !text(snapshot.principle, 'принцип снимка') || !text(snapshot.hint, 'подсказка снимка') || !Array.isArray(snapshot.explanations) || !snapshot.explanations.every(function (x) { return typeof x === 'string'; })) fail('Некорректный снимок вопроса');
+    if(typeof snapshot.scenarioFamilyId!=='string'||!id(snapshot.scenarioFamilyId,'семейство ситуации'))fail('В снимке отсутствует семейство ситуации');
     if (snapshot.type === 'numeric') {
       if (typeof snapshot.answer !== 'number' || !isFinite(snapshot.answer) || typeof snapshot.tolerance !== 'number' || !isFinite(snapshot.tolerance) || snapshot.tolerance < 0) fail('Некорректный числовой снимок');
     } else if (snapshot.type === 'matching') {
@@ -80,6 +82,13 @@
       if (!Array.isArray(snapshot.options) || !snapshot.options.length || !snapshot.options.every(function (x) { return typeof x === 'string'; }) || !Array.isArray(snapshot.correct) || !snapshot.correct.length || !snapshot.correct.every(function (x) { return Number.isInteger(x) && x >= 0 && x < snapshot.options.length; })) fail('Некорректный снимок выбора');
       uniqueIds(snapshot.correct.map(String), 'варианты снимка');
     }
+    if(snapshot.stimulus!==undefined){
+      var exhibit=snapshot.stimulus;
+      if(!plain(exhibit)||typeof exhibit.title!=='string'||typeof exhibit.context!=='string')fail('Некорректные данные кейса');
+      if(exhibit.table!==undefined){var table=exhibit.table;if(!plain(table)||typeof table.caption!=='string'||!Array.isArray(table.columns)||!table.columns.length||table.columns.length>12||!table.columns.every(x=>typeof x==='string')||!Array.isArray(table.rows)||table.rows.length>100||!table.rows.every(row=>Array.isArray(row)&&row.length===table.columns.length&&row.every(x=>typeof x==='string')))fail('Некорректная таблица кейса');}
+      if(exhibit.chart!==undefined){var chart=exhibit.chart;if(!exhibit.table||!plain(chart)||typeof chart.title!=='string'||typeof chart.unit!=='string'||!Array.isArray(chart.labels)||!chart.labels.length||chart.labels.length>24||!chart.labels.every(x=>typeof x==='string')||!Array.isArray(chart.values)||chart.values.length!==chart.labels.length||!chart.values.every(x=>typeof x==='number'&&isFinite(x)&&x>=0))fail('Некорректная диаграмма кейса');}
+    }
+    if(snapshot.caseId!==undefined){if(!id(snapshot.caseId,'кейс')||!Number.isInteger(snapshot.casePosition)||snapshot.casePosition<1)fail('Некорректная связь вопроса с кейсом');}
     return safe(snapshot, 0);
   }
   function quizMap(value, name, questionIds, check) {
@@ -87,7 +96,7 @@
     Object.keys(value).forEach(function (questionId) { if (!questionIds[questionId]) fail('Некорректный вопрос сессии'); check(value[questionId], questionId); });
   }
   function normalizeQuizSession(session) {
-    if (!plain(session) || !id(session.id, 'id сессии') || !['lesson','practice','timed'].includes(session.kind) || typeof session.lessonId !== 'string' || !Array.isArray(session.questionIds) || !Number.isInteger(session.index) || typeof session.finished !== 'boolean') fail('Некорректная учебная сессия');
+    if (!plain(session) || !id(session.id, 'id сессии') || !['lesson','practice','timed','case','diagnostic'].includes(session.kind) || typeof session.lessonId !== 'string' || !Array.isArray(session.questionIds) || !Number.isInteger(session.index) || typeof session.finished !== 'boolean') fail('Некорректная учебная сессия');
     var questionIds = uniqueIds(session.questionIds, 'вопросы сессии');
     if (!session.questionIds.length || session.index < 0 || session.index > session.questionIds.length || !Array.isArray(session.responseIds) || session.responseIds.length > session.questionIds.length) fail('Некорректная учебная сессия');
     uniqueIds(session.responseIds, 'ответы сессии');
@@ -110,6 +119,10 @@
     quizMap(session.assisted, 'подсказки', questionIds, function (value) { if (typeof value !== 'boolean') fail('Некорректная подсказка'); });
     quizMap(session.started, 'время начала вопроса', questionIds, function (value) { timestamp(value, 'начало вопроса'); });
     if (session.previouslySeen !== undefined) quizMap(session.previouslySeen, 'предыдущее знакомство', questionIds, function (value) { if (typeof value !== 'boolean') fail('Некорректная отметка предыдущего знакомства'); });
+    if(session.kind==='case'){
+      var cases=session.questionIds.map(qid=>session.questionSnapshots&&session.questionSnapshots[qid]);
+      if(cases.length!==3||cases.some(q=>!q||!q.caseId||q.caseId!==cases[0].caseId||q.scenarioFamilyId!==cases[0].scenarioFamilyId)||cases.map(q=>q.casePosition).sort().join(',')!=='1,2,3')fail('Неполный или несогласованный кейс');
+    }
     return safe(session, 0);
   }
   function validateState(input) {
@@ -210,8 +223,9 @@
   function countExperienceMonths(records, now) { var today=new Date(now || Date.now()), last=today.getUTCFullYear()*12+today.getUTCMonth(), first=last-119, used={}; arr(records,'experience').forEach(function(r){ if(!plain(r)||r.confirmed!==true) return; var a=ym(r.start), b=ym(r.end); if(!a||!b) fail('Некорректные границы опыта'); var ai=+a.slice(0,4)*12+(+a.slice(5)-1), bi=+b.slice(0,4)*12+(+b.slice(5)-1); if(ai>bi) fail('Некорректные границы опыта'); for(var i=Math.max(ai,first);i<=Math.min(bi,last);i++) used[i]=1; }); return Object.keys(used).length; }
   function remainingSeconds(session, now) { var deadline=session && new Date(session.deadline).getTime(), current=new Date(now || Date.now()).getTime(); if (!isFinite(deadline) || !isFinite(current)) return 0; return Math.max(0, Math.ceil((deadline-current)/1000)); }
   function readiness(bank, attempts) {
+    // Legacy standalone-item summary. The application uses learning.statistics for cases.
     var byId=new Map((bank||[]).map(q=>[q.id,q])), families=new Set(), first=[];
-    (attempts||[]).slice().sort((a,b)=>Date.parse(a.answeredAt)-Date.parse(b.answeredAt)||a.id.localeCompare(b.id)).forEach(a=>{var q=byId.get(a.questionId);if(!q||!['model_reviewed','expert_reviewed'].includes(q.status)||q.version!==a.questionVersion)return;var f=q.scenarioFamilyId;if(families.has(f))return;families.add(f);if(!a.assisted)first.push(a);});
+    (attempts||[]).slice().sort((a,b)=>Date.parse(a.answeredAt)-Date.parse(b.answeredAt)||a.id.localeCompare(b.id)).forEach(a=>{var q=byId.get(a.questionId);if(!q||q.caseId||!q.scenarioFamilyId||!['model_reviewed','expert_reviewed'].includes(q.status))return;var f=q.scenarioFamilyId;if(families.has(f))return;families.add(f);if(q.version===a.questionVersion&&!a.assisted&&!a.priorExposure)first.push(a);});
     var correct=first.filter(a=>a.correct).length;
     return {eligible:first.length,correct:correct,sufficient:first.length>=20,score:first.length?Math.round(correct*100/first.length):0};
   }

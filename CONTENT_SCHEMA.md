@@ -1,23 +1,37 @@
 # Lesson schema v2 (authoring contract)
 
-Each content/pack-NN.json is {schemaVersion:2,id:"pack-NN",version:2,lessons:[four lessons]}.
-Lessons retain L01…L24 IDs; questions retain Q01-1…Q24-5 IDs with version 2 (v1 results are archived).
+Each content/pack-NN.json is {schemaVersion:2,id:"pack-NN",version:3,lessons:[four lessons]}.
+Lessons retain L01…L24 IDs; each lesson has Qxx-1…Qxx-8, version 3. Existing Qxx-1…5 IDs and learner fields remain stable. A content version change does not make a previously seen scenario independent.
 
 Lesson fields:
-- id, version:2, week, title, approach (predictive/agile/hybrid), objectives:string[3], prerequisites:string[], introduction:string.
+- id, version:3, week, title, approach (predictive/agile/hybrid), objectives:string[3], prerequisites:string[], introduction:string.
 - eco:{domain:"People"|"Process"|"Business Environment",taskId:number,taskLabel:string}; real 2026 task, not generic invented labels.
 - sourceRefs:[{id:string,section:string}] (source registry supplied separately). status:"draft" initially.
 - terms:[{ru,en,definition}] (2–4 real definitions).
-- sections:[{title,paragraphs:string[],bullets?:string[]}] (3–4 distinct substantive explanations).
+- sections:[{title,paragraphs:string[],bullets?:string[]}] (at least four substantive explanations).
 - workedExample:{title,context,steps:string[],conclusion} (SAP example, explained decision process).
 - recall:{prompts:string[3],guidance:string[3]} (guidance hidden until learner chooses reveal).
 - transferCase:{title,context,prompts:string[3],hint,analysis:string[],alternate:string} (different industry, context contains NO answer; analysis initially hidden; explicit reason to transfer principle).
 - artifact:{title,instructions,fields:[{id,label,placeholder}],example:string,rubric:string[]} (3–5 useful fields, worked exemplar hidden).
 - pitfalls:[{mistake,correction}], summary:string[], stretch:{prompt,analysis}.
-- questions: five ORIGINAL per-topic items, varied key positions, no repetitive generic questions, no unrelated EVM.
+- questions: eight ORIGINAL per-topic items, varied key positions, no repetitive generic questions, no unrelated EVM.
 - cards: 2 on odd weeks, 3 on even weeks = 60 across 24 weeks; [{id:"C01-1",front,back}].
 
-Question fields: id,version:2,type:"single"|"multi"|"numeric"|"matching",prompt, options:string[],correct:number[] (single/multi). For numeric use answer:number,tolerance:number,unit:string; no options/correct needed. For matching use left:string[],right:string[],correct:number[] with indices of right choices by left index. All have explanations:string[] (per option for single/multi, per match for matching, one computation for numeric), principle:string, hint:string, difficulty:"foundation"|"application"|"analysis", scenarioFamilyId:string (honestly distinct), context:"sap"|"other", approach, eco same shape, sourceRefs same shape, status:"draft", reserve:false.
+Question fields: id,version:3,type:"single"|"multi"|"numeric"|"matching",prompt, options:string[],correct:number[] (single/multi). For numeric use answer:number,tolerance:number,unit:string; no options/correct needed. For matching use left:string[],right:string[],correct:number[] with indices of right choices by left index. All have explanations:string[] (per option for single/multi, per match for matching, one computation for numeric), principle:string, hint:string, difficulty:"foundation"|"application"|"analysis", scenarioFamilyId:string (honestly distinct), context:"sap"|"other", approach, eco same shape, sourceRefs same shape, status:"draft", reserve:false.
+
+## Practice labs and linked cases in content 2026.3
+
+- `lab:{title,objective,minutes:35,context,table,steps:string[],prompts:string[3],solution:string[],rubric:string[],sourceRefs,chart?}`. Every lesson has one. Three written responses must show reasoning and a usable result; the solution is initially hidden. The learner checks the rubric. Time is an estimate, not a locked timer or proof of learning.
+- `table:{caption,columns:string[],rows:string[][]}`; rows match the column count. At least three rows, at most twelve columns. Values are strings, and include units where needed.
+- `chart?:{title,labels:string[],values:number[],unit}`; nonnegative values, matching labels, at most 24. A table repeats the values for accessibility. Native SVG bars use a zero origin.
+- `caseStudy:{id,title,context,table,chart?}` in L03/L06/L11/L16/L18/L23. Qxx-6…8 have that `caseId`, `casePosition:1|2|3`, and one shared `scenarioFamilyId`. They are one scenario, not three independent measurements.
+- Individual questions may have `stimulus:{title,context,table?,chart?}`. `study.js` copies the shared case into each session question snapshot so offline history is self-contained.
+
+`study.js` shuffles single/multi options and matching right choices once when the session starts, remapping keys and per-option explanations. Saved snapshots determine grading and feedback after reload, import or a content update. All answers in a case are collected before feedback; case evidence counts once only when complete.
+
+Editorial gates in `tools/content_quality.py` check all 26 primary ECO tasks, metadata, layouts, answer-position variation and the longest-answer cue. They do not establish psychometric validity. Blind review input is generated by `tools/prepare_blind_review.py`; reviewer answers must be saved before opening keys. Reviewed lessons/questions include `reviewedBy`, `reviewModel`, and `reviewDate`.
+
+`reviews/review-manifest-2026.3.json` ties the final reviewed pack bytes (SHA-256 with LF normalization) to review reports and blind-answer files. It is recorded only after review and corrections are complete. A later content edit fails `verify.py` until the changed material has been reviewed and the record updated. The hash establishes which content was reviewed, not whether the review was accurate.
 
 Content is Russian and original. Aim 650–1000 meaningful Russian words per lesson excluding questions, with 15–20 minutes of active writing/application, not 35 minutes of reading. Avoid padding. Explain new terms; contrast roles and situations; teach concrete method with worked data. Source-check claims; do not present ECO as a textbook authority for formulas. Every lesson must stand alone for beginner PM with senior SAP technical background.
 

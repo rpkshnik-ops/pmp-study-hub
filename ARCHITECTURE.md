@@ -1,5 +1,15 @@
 # Architecture decision — 2026-09-18
 
+## Content remediation 2.2 — 2026-09-22
+
+The PMBOK/ECO audit required both richer tasks and changes in assessment behavior. `study.js` now handles approved content selection, case stimuli and shuffled immutable question snapshots. `core.js` validates those snapshots and the case session structure; `learning.js` aggregates linked questions as one scenario. `app.js` renders tables, accessible SVG charts, labs and the public coverage map. The application stays offline and uses the same schema v2 storage key.
+
+Every lesson has a separate data lab with three saved open responses, a hidden worked solution and explicit self-assessment criteria. New lab and weekly challenge fields are versioned without deleting previous notes or completion records. The complete topic spans several sessions in the 300-minute weekly plan. Estimates describe intended practice, not measured learner effort.
+
+Answer options are shuffled once per session and the matching keys/explanations are saved with them. Reload, import and later content changes preserve what the learner actually answered. A case has three related questions with deferred feedback. Unfinished deferred attempts are hidden from statistics and the error list; mistake review is scheduled only after the session ends. A case counts once, requiring every answer to be correct. Prior exposure, hints, old versions and quarantined families cannot inflate independent first-attempt evidence.
+
+Quality gates check content structure, all 26 ECO task labels, key-position variation and the answer-length cue. These checks accompany a separate Sol review; they do not calibrate difficulty, grade open responses or establish PMP readiness. Original learning questions remain separate from the absent exam reserve. The full mock stays blocked until an independent reserve and exam engine are ready.
+
 ## Findings
 
 The initial monolithic app interleaves generated content, storage, routing and rendering. Attempts overwrite history; autosave is absent; imports accept malformed state and grow recursive backups. Cached v1 assets can mask fixes because service worker searches all old caches. Readiness counts draft duplicate questions. The prior test script searches source strings and proves none of these behaviors.

@@ -1,14 +1,14 @@
 /* UI layer. Content lives in JSON packs; persistence and scoring live in core.js. */
 'use strict';
 (() => {
-  const C = globalThis.PMPCore, L = globalThis.PMPLearning, config = globalThis.PMPConfig;
+  const C = globalThis.PMPCore, L = globalThis.PMPLearning, S = globalThis.PMPStudy, config = globalThis.PMPConfig;
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const uid = () => crypto.randomUUID();
   const now = () => new Date().toISOString();
   const paragraphs = lines => lines.map(line => '<p>'+esc(line)+'</p>').join('');
   const list = (items, ordered = false) => '<'+(ordered?'ol':'ul')+' class="steps">'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</'+(ordered?'ol':'ul')+'>';
-  const steps = [['read','Понятия','8 мин'],['example','Разобранный пример','4 мин'],['recall','Вспомнить','4 мин'],['case','Новая ситуация','8 мин'],['artifact','Применить','6 мин'],['check','Проверить','5 мин']];
+  const steps = [['read','Понятия','В своём темпе'],['example','Разобранный пример','Проследить решение'],['recall','Вспомнить','Без конспекта'],['case','Новая ситуация','Перенести принцип'],['artifact','Применить','Рабочий документ'],['lab','Практикум с данными','Отдельный блок · ~35 мин'],['check','Проверить','Вопросы и итог']];
   const modes = {foundation:'Фундамент — 24 недели',practice:'Практика и поддержание',intensive:'Экзаменационный интенсив'};
   let state, lessons=[], questions=[], cards=[], stale=false, persistenceError=false, pendingImport, timer;
   let currentRoute={name:'today',params:new URLSearchParams()}, waitingWorker,reviewExtra=0;
@@ -17,7 +17,27 @@
   const sessionQuestion = s => s.questionSnapshots?.[s.questionIds[s.index]] || getQuestion(s.questionIds[s.index]);
   const lessonUrl = (id,step='read') => '#lesson?id='+id+'&step='+step;
   const work = id => state.lessonWork[id] ||= {step:'read',fields:{},revealed:[],confidence:''};
-  const eligibleBank = () => questions.filter(q=>!state.quarantined.some(x=>x.questionId===q.id));
+  const eligibleBank = () => S.available(questions,state);
+  const deferred = s => ['timed','case','diagnostic','exam'].includes(s.kind);
+  const hiddenAttempts = () => new Set([state.sessions.quiz,...Object.values(state.sessions.saved||{})].filter(s=>s&&!s.finished&&deferred(s)).flatMap(s=>s.responseIds||[]));
+  function scheduleMistake(a){
+    if(!a.correct)cards.filter(c=>c.lessonId===a.questionSnapshot.lessonId).forEach(c=>state.reviews[c.id]=C.nextReview(state.reviews[c.id],false,a.confidence,false));
+  }
+  function finishSession(s){
+    if(s.finished)return;
+    s.finished=true;
+    if(deferred(s))s.responseIds.map(id=>state.attempts.find(a=>a.id===id)).filter(Boolean).forEach(scheduleMistake);
+  }
+  function dataTable(table){
+    if(!table)return '';
+    return '<div class="table-scroll" role="region" aria-label="'+esc(table.caption)+'" tabindex="0"><table class="data-table"><caption>'+esc(table.caption)+'</caption><thead><tr>'+table.columns.map(c=>'<th scope="col">'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+table.rows.map(row=>'<tr>'+row.map((cell,i)=>'<'+(i===0?'th scope="row"':'td')+'>'+esc(cell)+'</'+(i===0?'th':'td')+'>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  }
+  function chart(data){
+    if(!data)return '';
+    const max=Math.max(1,...data.values),height=70+data.labels.length*42;
+    return '<figure class="data-chart"><figcaption>'+esc(data.title)+' · '+esc(data.unit)+'</figcaption><svg role="img" aria-label="'+esc(data.title)+'" viewBox="0 0 640 '+height+'"><desc>Столбцы начинаются от нуля. Значения также приведены в таблице.</desc>'+data.labels.map((label,i)=>{const y=32+i*42;return '<text x="5" y="'+(y+19)+'">'+esc(label)+'</text><rect x="180" y="'+y+'" width="'+(data.values[i]/max*350)+'" height="26"></rect><text x="'+(188+data.values[i]/max*350)+'" y="'+(y+19)+'">'+esc(data.values[i])+'</text>';}).join('')+'<line x1="180" y1="20" x2="180" y2="'+(height-20)+'"></line><text x="176" y="'+(height-2)+'">0</text></svg></figure>';
+  }
+  function stimulus(data){return data?'<section class="case-context"><h2>'+esc(data.title)+'</h2><p>'+esc(data.context)+'</p>'+dataTable(data.table)+chart(data.chart)+'</section>':'';}
   function notice(message) { $('#notice').textContent=message; $('#notice').hidden=!message; }
   function toast(message) { $('#toast').textContent=message; $('#toast').classList.add('show'); setTimeout(()=>$('#toast').classList.remove('show'),3000); }
   function persist() {
@@ -31,7 +51,7 @@
       const source=config.sources[ref.id]; return '<li>'+(source?'<a href="'+esc(source.url)+'" target="_blank" rel="noopener noreferrer">'+esc(source.title)+'</a>':esc(ref.id))+' — '+esc(ref.section)+'</li>';
     }).join('')+'</ul>';
   }
-  function lessonCard(l) { const done=state.completedLessons.includes(l.id);return '<article class="card"><p class="eyebrow">Неделя '+l.week+' · '+esc(l.approach)+'</p><h2><a href="'+lessonUrl(l.id,work(l.id).step)+'">'+esc(l.title)+'</a></h2><p>'+esc(l.objectives[0])+'</p><span class="badge">'+(done?'Практика выполнена':'Около 35 минут с заданиями')+'</span></article>'; }
+  function lessonCard(l) { const done=state.completedLessons.includes(l.id);return '<article class="card"><p class="eyebrow">Неделя '+l.week+' · '+esc(l.approach)+'</p><h2><a href="'+lessonUrl(l.id,work(l.id).step)+'">'+esc(l.title)+'</a></h2><p>'+esc(l.objectives[0])+'</p><span class="badge">'+(done?'Основной урок пройден':'Основы и самостоятельная практика')+'</span>'+(l.lab?'<p><a href="'+lessonUrl(l.id,'lab')+'">Практикум: '+esc(l.lab.title)+'</a></p>':'')+'</article>'; }
   function savedField(lid,key,label,placeholder='') { return '<label>'+esc(label)+'<textarea maxlength="5000" data-work="'+lid+'" data-field="'+esc(key)+'" placeholder="'+esc(placeholder)+'">'+esc(work(lid).fields[key]||'')+'</textarea></label>'; }
   function reveal(lid,key,label,body) {
     const opened=work(lid).revealed.includes(key);
@@ -70,11 +90,13 @@
   function weekPage(){
     const lesson=getLesson(currentRoute.params.get('id'))||L.selectLesson(lessons,state)||getLesson(state.settings.studyWeek?.lessonId)||lessons[23],plan=L.week(lesson,state);
     const task=plan.items.find(t=>t.id===currentRoute.params.get('task'))||plan.items.find(t=>!t.done)||plan.items[0],fields=work(lesson.id).fields;
+    const previousChallenge=task.id==='challenge'&&lesson.lab?fields[L.prefix(state.settings.mode)+'challengenote']:'';
     return pageHeading('Неделя '+lesson.week,lesson.title,'План — последовательность результатов. Продвигайтесь в своём темпе; пропуски не накапливают долг.')+
       '<label class="compact">Выбрать тему<select id="weekSelect">'+lessons.map(l=>'<option value="'+l.id+'"'+(l.id===lesson.id?' selected':'')+'>'+l.week+'. '+esc(l.title)+'</option>').join('')+'</select></label>'+
       '<div class="panel"><div class="inline"><b>'+plan.done+' / '+plan.items.length+' шагов выполнено</b><span>План: '+plan.total+' мин · осталось '+plan.remaining+' мин</span></div><progress value="'+plan.done+'" max="'+plan.items.length+'"></progress><p>Доступно '+plan.budget+' мин в неделю. '+(plan.weeks>1?'Оставшаяся практика рассчитана примерно на '+plan.weeks+' недели при вашем бюджете.':'Можно выполнить оставшийся объём в пределах недели.')+' Это план времени, а не измеренная длительность.</p>'+(state.settings.mode!=='foundation'?'<p>В этом режиме план начинается заново каждую календарную неделю. Предыдущие записи остаются в экспорте.</p>':'')+'</div>'+
       '<div class="lesson-shell weekly"><aside class="lesson-nav" aria-label="Шаги недели">'+plan.items.map(t=>'<a href="#week?id='+lesson.id+'&task='+t.id+'"'+(t.id===task.id?' aria-current="step"':'')+'>'+(t.done?'✓ ':'')+esc(t.title)+'<small>'+t.minutes+' мин</small></a>').join('')+'</aside>'+
       '<section class="lesson-body"><h2>'+esc(task.title)+'</h2>'+list(task.instructions,true)+'<div class="callout"><b>Результат:</b> '+esc(task.result)+'</div><p><a href="'+lessonUrl(lesson.id,task.step)+'">Открыть материал и пример по теме</a> · <a href="#review">Повторить карточки</a></p>'+
+      (previousChallenge?'<details><summary>Моя работа до обновления практикума</summary><p>'+esc(previousChallenge)+'</p><p>Она сохранена. Новое задание имеет отдельную отметку.</p></details>':'')+
       savedField(lesson.id,task.key+'note','Мой результат, обоснование и следующий шаг',task.result)+
       '<label>Самопроверка<select data-work="'+lesson.id+'" data-field="'+task.key+'check"><option value="">Выберите</option><option value="yes"'+(fields[task.key+'check']==='yes'?' selected':'')+'>Сверил с критериями и отметил оставшиеся сомнения</option></select></label><p class="form-note">Это ваша самооценка. Приложение сохраняет работу, но не проверяет смысл открытого ответа автоматически.</p><button data-action="complete-week" data-id="'+lesson.id+'" data-task="'+task.id+'">'+(task.done?'Сохранить уточнения':'Отметить шаг выполненным')+'</button> <button class="quiet" data-action="export-week" data-id="'+lesson.id+'">Скачать работу недели</button><div id="weekFeedback" role="status"></div>'+(task.done?'<p class="feedback">Результат сохранён. <a href="#week?id='+lesson.id+'">К следующему незавершённому шагу</a></p>':'')+'</section></div>';
   }
@@ -85,12 +107,31 @@
       '<p>Среди первых ответов: с подсказкой — '+report.helped+', после предыдущего знакомства с вопросом — '+report.repeated+'. Они, а также прежние версии и вопросы с отмеченной неоднозначностью, не повышают эти показатели.</p>'+
       '<h2>На что обратить внимание</h2>'+(weak.length?'<div class="grid">'+weak.map(t=>{const l=getLesson(t.id);return '<article class="card"><h3>'+esc(l.title)+'</h3><p>'+t.correct+' верных из '+t.n+' самостоятельных; сомнений: '+t.uncertain+'.</p><a href="#week?id='+l.id+'&task=recall">Восстановить принцип</a> · <a href="'+lessonUrl(l.id,'case')+'">Применить в ситуации</a></article>';}).join('')+'</div>':'<p>Пока нет выявленных слабых тем. Это может означать, что самостоятельных ответов ещё мало. Начните с первого урока.</p>')+
       '<h2>Темы и выполненная работа</h2><div class="table-scroll"><table><thead><tr><th scope="col">Тема</th><th scope="col">Учебная работа</th><th scope="col">Самостоятельные ответы</th><th scope="col">План</th></tr></thead><tbody>'+report.topics.map(t=>{const l=getLesson(t.id),plan=L.week(l,state),revealed=work(l.id).revealed.length;return '<tr><th scope="row"><a href="'+lessonUrl(l.id)+'">'+l.week+'. '+esc(l.title)+'</a></th><td>'+(t.completed?'Практика выполнена':'В работе')+'<br><small>открыто разборов: '+revealed+'</small></td><td>'+t.correct+' / '+t.n+'<br><small>с подсказкой: '+t.helped+'</small></td><td><a href="#week?id='+l.id+'">'+plan.done+' / '+plan.items.length+' шагов</a></td></tr>';}).join('')+'</tbody></table></div>'+
-      '<p class="form-note">В теме всего пять вопросов: этого мало для надёжного вывода об освоении. Открытые ответы сравнивайте с рубрикой; через 7–14 дней проверьте воспроизведение без разбора.</p>';
+      '<p class="form-note">Количество вопросов темы ограничено. Связанный кейс считается одной ситуацией после полного решения. Открытые ответы сравнивайте с рубрикой; через 7–14 дней проверьте воспроизведение без разбора.</p>';
   }
   function library() {
     return pageHeading('Уроки и словарь','От понятия к управленческому решению','Все 24 темы доступны сразу. Для системного старта рекомендуем последовательность маршрута.')+
+    coverageMap()+
     '<label class="search">Поиск по теме и термину<input id="lessonSearch" type="search" placeholder="Например, риск, scope, EVM"></label><div class="grid two" id="lessonResults">'+lessons.map(lessonCard).join('')+'</div>'+
     '<h2>Словарь с объяснениями</h2><dl class="terms">'+lessons.flatMap(l=>l.terms.map(t=>'<div><dt>'+esc(t.ru)+'<small>'+esc(t.en)+'</small></dt><dd>'+esc(t.definition)+' <a href="'+lessonUrl(l.id)+'">Урок '+l.week+'</a></dd></div>')).join('')+'</dl>';
+  }
+  function coverageMap(){
+    const lessonLinks=ids=>[...new Set(ids)].map(id=>'<a href="'+lessonUrl(id)+'">'+esc(getLesson(id)?.title||id)+'</a>').join('; ');
+    const domains=[['People',8],['Process',10],['Business Environment',8]];
+    return '<details id="coverageMap"><summary>Карта курса: PMBOK 8 и задачи PMP ECO</summary><p>Это авторское сопоставление тем с публичным оглавлением PMBOK 8 и ECO от 11.08.2026. Оно помогает выбрать материал для повторения. Наличие темы или вопроса не доказывает полноту освоения и готовность к экзамену.</p>'+
+      '<h2>Семь областей PMBOK 8</h2><ul class="steps">'+config.pmbokDomains.map(d=>'<li><b>'+esc(d.title)+':</b> '+lessonLinks(d.lessons)+'</li>').join('')+'</ul><p>Качество, устойчивость, ценность и лидерство рассматриваются в нескольких темах. Полный текст стандарта в курс не включён.</p>'+
+      '<h2>Вопросы по задачам ECO</h2><p>Счётчики показывают текущий учебный банк. Связанные вопросы одного кейса используют общее семейство ситуаций; суммы семейств по строкам могут пересекаться.</p>'+
+      domains.map(([domain,count])=>'<h3>'+esc(domain)+' · доля в экзамене '+config.blueprint.domains[domain]+'%</h3><p>В учебном банке: '+questions.filter(q=>q.eco.domain===domain).length+' из '+questions.length+' вопросов. Банк организован по темам и не воспроизводит экзаменационное распределение.</p><ol class="steps">'+Array.from({length:count},(_,i)=>{const items=questions.filter(q=>q.eco.domain===domain&&q.eco.taskId===i+1);return '<li><b>'+esc(items[0]?.eco.taskLabel||'Задача '+(i+1))+'</b><br>'+items.length+' вопросов · '+new Set(items.map(q=>q.scenarioFamilyId)).size+' семейств ситуаций<br>'+lessonLinks(items.map(q=>q.lessonId))+'</li>';}).join('')+'</ol>').join('')+
+      sourceLinks([{id:'PMBOK-8-TOC',section:'Guide, section 2: Project Management Performance Domains'},{id:'PMI-ECO-2026',section:'People, Process, Business Environment: tasks 1–8 / 1–10 / 1–8'}])+'</details>';
+  }
+  function labBody(l){
+    const lab=l.lab;if(!lab)return '<h2>Практикум готовится</h2><a href="'+lessonUrl(l.id,'artifact')+'">К рабочему документу</a>';
+    const key=S.labKey(l),fields=work(l.id).fields;
+    return '<h2>'+esc(lab.title)+'</h2><p class="lead">'+esc(lab.objective)+'</p><p>Это отдельное занятие с данными. Ориентир — '+lab.minutes+' минут; можно продолжить позже с сохранённого черновика.</p><p>'+esc(lab.context)+'</p>'+dataTable(lab.table)+chart(lab.chart)+
+      '<h3>Порядок работы</h3>'+list(lab.steps,true)+lab.prompts.map((prompt,i)=>savedField(l.id,key+'answer-'+i,prompt,'Покажите рассуждение, данные и условие пересмотра решения.')).join('')+
+      reveal(l.id,key+'solution','Сверить решение и расчёты',paragraphs(lab.solution))+
+      '<h3>Проверить собственную работу</h3><p>Оцените каждый критерий по написанному ответу. Это самопроверка: приложение не оценивает смысл текста.</p>'+lab.rubric.map((rule,i)=>'<label>'+esc(rule)+'<select data-work="'+l.id+'" data-field="'+key+'criterion-'+i+'"><option value="">Выберите</option><option value="yes"'+(fields[key+'criterion-'+i]==='yes'?' selected':'')+'>В ответе есть доказательство</option><option value="revise"'+(fields[key+'criterion-'+i]==='revise'?' selected':'')+'>Нужно доработать</option></select></label>').join('')+
+      '<div class="actions"><button data-action="complete-lab" data-id="'+l.id+'">Сохранить итог практикума</button><button class="secondary" data-action="export-lab" data-id="'+l.id+'">Скачать решение</button></div><p id="labFeedback" role="status">'+(fields[key+'done']?'Практикум этой версии выполнен и проверен вами. Вернитесь к нему через неделю без готового разбора.':'')+'</p>'+sourceLinks(lab.sourceRefs||[]);
   }
   function lessonPage() {
     const l=getLesson(currentRoute.params.get('id')||'L01');
@@ -118,27 +159,31 @@
       '<h3>Проверка качества документа</h3>'+list(l.artifact.rubric)+
       reveal(l.id,'artifact-example','Посмотреть заполненный пример','<p>'+esc(l.artifact.example)+'</p>')+
       '<button data-action="export-artifact" data-id="'+l.id+'" class="secondary">Скачать мой документ</button>';
+    if(step==='lab') body=labBody(l);
     if(step==='check') {
       const currentAttempts=state.attempts.filter(a=>l.questions.some(q=>q.id===a.questionId&&q.version===a.questionVersion));
       const answered=new Set(currentAttempts.map(a=>a.questionId)).size;
-      body='<h2>Что остаётся после урока</h2>'+list(l.summary)+'<h3>Пять новых вопросов по теме</h3><p>Вы уже ответили на '+answered+' из 5 вопросов этой версии. Разборы объясняют и выбранное решение, и границы его применимости.</p>'+
+      body='<h2>Что остаётся после урока</h2>'+list(l.summary)+'<h3>Вопросы по теме</h3><p>Вы уже ответили на '+answered+' из '+l.questions.length+' вопросов этой версии. Знакомые ситуации и исправленные версии не считаются независимыми новыми заданиями.</p>'+
       '<button data-action="start-practice" data-id="'+l.id+'">Решить вопросы урока</button>'+
+      (l.caseStudy?'<section class="callout"><h3>'+esc(l.caseStudy.title)+'</h3><p>Три связанных вопроса к общим данным. Разбор откроется после всего кейса.</p><button data-action="start-case" data-id="'+l.id+'">Решить связанный кейс</button></section>':'')+
+      (l.lab?'<p><a href="'+lessonUrl(l.id,'lab')+'">Практикум с данными: '+esc(l.lab.title)+'</a></p>':'')+
       '<h3>Закрыть занятие</h3><p>Отметка означает, что вы сделали учебную работу. Она не подтверждает профессиональную квалификацию.</p>'+
       '<label>Сейчас я…<select data-work="'+l.id+'" data-field="confidence"><option value="">Выберите</option>'+[['3','могу объяснить и применить'],['2','понимаю, но ещё сомневаюсь'],['1','нуждаюсь в повторении']].map(([v,t])=>'<option value="'+v+'"'+(w.fields.confidence===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>'+
       '<button data-action="complete" data-id="'+l.id+'">'+(state.completedLessons.includes(l.id)?'Сохранить результат занятия':'Завершить занятие')+'</button><div id="completionFeedback"></div>'+
       (state.completedLessons.includes(l.id)?'<div class="feedback">Занятие завершено. Дальше — применение и закрепление. <a href="#week?id='+l.id+'">Продолжить практику темы</a></div>':'');
     }
     const reviewed=l.status==='model_reviewed';
-    return '<div class="lesson-shell"><aside class="lesson-nav"><p class="eyebrow">Урок '+l.week+' · ~35 мин</p>'+steps.map(([k,title,time])=>'<a href="'+lessonUrl(l.id,k)+'"'+(k===step?' aria-current="step"':'')+'>'+title+'<small>'+time+'</small></a>').join('')+'<p class="save-status">Ответы сохраняются автоматически</p></aside>'+
+    return '<div class="lesson-shell"><aside class="lesson-nav"><p class="eyebrow">Тема '+l.week+' · несколько занятий</p>'+steps.map(([k,title,time])=>'<a href="'+lessonUrl(l.id,k)+'"'+(k===step?' aria-current="step"':'')+'>'+title+'<small>'+time+'</small></a>').join('')+'<p class="save-status">Ответы сохраняются автоматически</p></aside>'+
     '<article class="lesson-body"><div class="lesson-header"><p class="eyebrow">Неделя '+l.week+' · '+esc(l.approach)+'</p><h1>'+esc(l.title)+'</h1><span class="tag">'+esc(l.eco.domain)+' · Task '+l.eco.taskId+'</span><span class="badge">'+(reviewed?'Рецензия модели выполнена; независимой экспертной проверки нет':'Авторский материал: предметная проверка продолжается')+'</span></div>'+
     body+'<div class="lesson-actions">'+(idx>0?'<a class="button secondary" href="'+lessonUrl(l.id,steps[idx-1][0])+'">← Назад</a>':'<a href="#lessons">Все уроки</a>')+(idx<steps.length-1?'<a class="button" href="'+lessonUrl(l.id,steps[idx+1][0])+'">Далее: '+steps[idx+1][1]+' →</a>':'<a href="#today">На сегодня</a>')+'</div>'+
     '<details><summary>Источники и учебная привязка</summary><p>'+esc(l.eco.taskLabel)+'. Привязка к ECO — авторская классификация темы. Проверено '+config.checkedAt+'.</p>'+sourceLinks(l.sourceRefs)+'</details></article></div>';
   }
   function startPractice(lessonId,kind='lesson') {
-    const selected=lessonId?getLesson(lessonId).questions.filter(q=>!state.quarantined.some(x=>x.questionId===q.id)):L.freshQuestions(lessons,state);
+    const bank=eligibleBank();
+    const selected=kind==='case'?S.caseQuestions(bank,lessonId):lessonId?bank.filter(q=>q.lessonId===lessonId&&!q.caseId&&!q.reserve):L.freshQuestions(lessons,state);
     if(!selected.length){toast('Нет новых проверенных вопросов. Можно повторить учебные вопросы конкретного урока.');return;}
     parkSession();
-    state.sessions.quiz={id:uid(),kind,lessonId:lessonId||'',questionIds:selected.map(q=>q.id),previouslySeen:Object.fromEntries(selected.map(q=>[q.id,state.exposures.some(x=>x.id===q.scenarioFamilyId)])),questionSnapshots:Object.fromEntries(selected.map(q=>[q.id,structuredClone(getQuestion(q.id))])),index:0,startedAt:now(),deadline:kind==='timed'?new Date(Date.now()+selected.length*90*1000).toISOString():'',draftAnswers:{},confidence:{},assisted:{},started:{},responseIds:[],finished:false};
+    state.sessions.quiz={id:uid(),kind,lessonId:lessonId||'',questionIds:selected.map(q=>q.id),previouslySeen:Object.fromEntries(selected.map(q=>[q.id,S.wasSeen(q,state)])),questionSnapshots:Object.fromEntries(selected.map(q=>[q.id,S.prepareQuestion(getQuestion(q.id))])),index:0,startedAt:now(),deadline:kind==='timed'?new Date(Date.now()+selected.length*90*1000).toISOString():'',draftAnswers:{},confidence:{},assisted:{},started:{},responseIds:[],finished:false};
     persist();location.hash='#practice?session=active';
     if(currentRoute.params.get('session')==='active') render();
   }
@@ -148,29 +193,37 @@
     return pageHeading('Практика','Отработать конкретный принцип','Вопросы сохранены вместе с разбором. Ответы и выбранная уверенность остаются после перезагрузки.')+
       (active?'<div class="callout">Есть незавершённая сессия. <a href="#practice?session=active">Продолжить</a></div>':'')+
       Object.values(state.sessions.saved||{}).filter(s=>!s.finished).map(s=>'<p><button class="secondary" data-action="resume-saved" data-id="'+esc(s.id)+'">Продолжить сохранённую тренировку: '+esc(getLesson(s.lessonId)?.title||'на время')+'</button></p>').join('')+
-      '<div class="grid two">'+lessons.map(l=>'<article class="card"><p class="eyebrow">Урок '+l.week+'</p><h2>'+esc(l.title)+'</h2><p>5 вопросов · '+esc(l.approach)+'</p><button data-action="start-practice" data-id="'+l.id+'">Практиковаться</button> <a href="'+lessonUrl(l.id,'artifact')+'">Рабочий документ</a></article>').join('')+'</div>';
+      '<div class="grid two">'+lessons.map(l=>'<article class="card"><p class="eyebrow">Урок '+l.week+'</p><h2>'+esc(l.title)+'</h2><p>'+l.questions.length+' вопросов'+(l.caseStudy?', включая 3 по общему кейсу':'')+' · '+esc(l.approach)+'</p><button data-action="start-practice" data-id="'+l.id+'">Практиковаться</button>'+(l.caseStudy?' <button class="secondary" data-action="start-case" data-id="'+l.id+'">Связанный кейс</button>':'')+'<p><a href="'+lessonUrl(l.id,'lab')+'">Практикум с данными</a> · <a href="'+lessonUrl(l.id,'artifact')+'">Рабочий документ</a></p></article>').join('')+'</div>';
   }
   function quizPage() {
     const s=state.sessions.quiz;
-    if(s.deadline&&C.remainingSeconds(s)===0&&!s.finished){s.finished=true;persist();}
+    if((s.deadline&&C.remainingSeconds(s)===0)||s.index>=s.questionIds.length){finishSession(s);persist();}
     if(s.finished||s.index>=s.questionIds.length) return quizSummary(s);
+    if(S.missingSnapshot(s))return pageHeading('Старая тренировка','Для этого вопроса не сохранился снимок')+'<p>Черновик остаётся в экспорте. Без исходного порядка вариантов его нельзя оценить по обновлённому вопросу. Начните новую тренировку по теме.</p><a class="button" href="#practice">К списку тем</a>';
     const a=state.attempts.find(x=>x.id===s.responseIds[s.index]),q=a?.questionSnapshot||sessionQuestion(s);
     if(!q) return '<p>Версия вопроса обновилась. Сохранённые ответы остаются в истории. Начните новую сессию.</p><a href="#practice">К практике</a>';
-    if(!s.started[q.id]) s.started[q.id]=now();
+    if(!s.started[q.id]){
+      const sameFamilyStarted=s.questionIds.some(id=>s.started[id]&&(s.questionSnapshots?.[id]||getQuestion(id))?.scenarioFamilyId===q.scenarioFamilyId);
+      if(!sameFamilyStarted&&S.wasSeen(q,state)){
+        s.previouslySeen ||= {};
+        s.questionIds.filter(id=>(s.questionSnapshots?.[id]||getQuestion(id))?.scenarioFamilyId===q.scenarioFamilyId).forEach(id=>s.previouslySeen[id]=true);
+      }
+      s.started[q.id]=now();
+    }
     if(!state.exposures.some(x=>x.id===q.scenarioFamilyId)) state.exposures.push({id:q.scenarioFamilyId,questionId:q.id,at:now()});
-    persist();
     s.questionSnapshots ||= {};s.questionSnapshots[q.id] ||= structuredClone(q);
+    persist();
     const draft=s.draftAnswers[q.id];
     let controls='';
     if(q.type==='single'||q.type==='multi') controls=q.options.map((option,i)=>'<label class="choice"><input type="'+(q.type==='multi'?'checkbox':'radio')+'" name="answer" value="'+i+'"'+(Array.isArray(draft)&&draft.includes(i)?' checked':'')+'><span>'+esc(option)+'</span></label>').join('');
     if(q.type==='numeric') controls='<label>Числовой ответ'+(q.unit?' ('+esc(q.unit)+')':'')+'<input name="numeric" inputmode="decimal" required value="'+esc(draft??'')+'"></label>';
     if(q.type==='matching') controls=q.left.map((left,i)=>'<label>'+esc(left)+'<select name="match-'+i+'" required><option value="">Выберите соответствие</option>'+q.right.map((right,j)=>'<option value="'+j+'"'+(draft?.[i]===j?' selected':'')+'>'+esc(right)+'</option>').join('')+'</select></label>').join('');
     return pageHeading('Практика', 'Вопрос '+(s.index+1)+' из '+s.questionIds.length)+
-      '<div class="compact"><p class="question-number">'+esc(getLesson(q.lessonId)?.title||q.topic||'')+' · '+esc(q.approach)+(s.deadline?' · Осталось <span id="timer" class="timing"></span>':'')+'</p><h2>'+esc(q.prompt)+'</h2>'+
+      '<div class="compact"><p class="question-number">'+esc(getLesson(q.lessonId)?.title||q.topic||'')+' · '+esc(q.approach)+(s.deadline?' · Осталось <span id="timer" class="timing"></span>':'')+'</p>'+stimulus(q.stimulus)+'<h2>'+esc(q.prompt)+'</h2>'+
       (state.quarantined.some(x=>x.questionId===q.id)?'<div class="callout">Вы сообщили о неоднозначности. Этот вопрос исключён из статистики знаний.</div>':'')+
-      (a?(s.kind==='timed'?'<div class="feedback">Ответ сохранён. Результаты и объяснения откроются после завершения тренировки.</div>':feedback(q,a)):'<form id="answerForm"><fieldset><legend>'+(q.type==='multi'?'Выберите все подходящие ответы':q.type==='matching'?'Сопоставьте элементы':'Ваш ответ')+'</legend>'+controls+'</fieldset>'+
+      (a?(deferred(s)?'<div class="feedback">Ответ сохранён. Результаты и объяснения откроются после завершения тренировки.</div>':feedback(q,a)):'<form id="answerForm"><fieldset><legend>'+(q.type==='multi'?'Выберите '+q.correct.length+' подходящих ответа':q.type==='matching'?'Сопоставьте элементы':'Ваш ответ')+'</legend>'+controls+'</fieldset>'+
       '<label>Перед разбором оцените уверенность<select name="confidence" required><option value="">Выберите</option>'+[['3','знаю'],['2','сомневаюсь'],['1','угадал']].map(([v,t])=>'<option value="'+v+'"'+(String(s.confidence[q.id])===v?' selected':'')+'>'+t+'</option>').join('')+'</select></label>'+
-      '<details id="questionHint"><summary>Дай подсказку</summary><p>'+esc(q.hint)+'</p></details><button type="submit">Проверить ответ</button><p id="answerError" class="error" role="status"></p></form>')+
+      '<details id="questionHint"><summary>Дай подсказку</summary><p>'+esc(q.hint)+'</p></details><button type="submit">'+(deferred(s)?'Сохранить ответ':'Проверить ответ')+'</button><p id="answerError" class="error" role="status"></p></form>')+
       '<div class="actions">'+(a?'<button data-action="next-question">'+(s.index+1===s.questionIds.length?'Завершить сессию':'Следующий вопрос')+'</button>':'')+'<a href="#practice">К списку тем</a><button class="quiet" data-action="ambiguity" data-id="'+q.id+'">Сообщить о неоднозначности</button></div></div>';
   }
   function feedback(q,a) {
@@ -183,13 +236,13 @@
   function quizSummary(s) {
     const attempts=s.responseIds.map(id=>state.attempts.find(a=>a.id===id)).filter(Boolean),correct=attempts.filter(a=>a.correct).length;
     return pageHeading('Сессия сохранена','Разберите результат и выберите следующий шаг')+
-      '<div class="panel compact"><div class="metric">'+correct+' / '+s.questionIds.length+'</div><p>верных ответов; отвечено '+attempts.length+'. С подсказкой: '+attempts.filter(a=>a.assisted).length+'.</p><p>Это учебная сессия. Повторные задания и подсказки не подтверждают независимую экзаменационную готовность.</p>'+
-      (s.lessonId?'<a class="button" href="'+lessonUrl(s.lessonId,'check')+'">Вернуться к завершению урока</a>':'<a class="button" href="#review">К повторению</a>')+'</div><h2>Ответы этой сесссии</h2>'+
-      attempts.map(a=>'<details><summary>'+esc(a.questionSnapshot.prompt)+' · '+(a.correct?'верно':'ошибка')+'</summary>'+feedback(a.questionSnapshot,a)+'</details>').join('');
+      '<div class="panel compact"><div class="metric">'+correct+' / '+s.questionIds.length+'</div><p>верных ответов; отвечено '+attempts.length+'. С подсказкой: '+attempts.filter(a=>a.assisted).length+'.</p><p>Это учебная сессия. Повторные задания и подсказки не подтверждают независимую экзаменационную готовность.</p>'+(s.kind==='case'?'<p>Все вопросы этого кейса — одна ситуация. В статистике она учитывается один раз и только после всех ответов; для успешного решения нужны все верные ответы.</p>':'')+
+      (s.lessonId?'<a class="button" href="'+lessonUrl(s.lessonId,'check')+'">Вернуться к завершению урока</a>':'<a class="button" href="#review">К повторению</a>')+'</div><h2>Ответы этой сессии</h2>'+
+      attempts.map(a=>'<details><summary>'+esc(a.questionSnapshot.prompt)+' · '+(a.correct?'верно':'ошибка')+'</summary>'+stimulus(a.questionSnapshot.stimulus)+feedback(a.questionSnapshot,a)+'</details>').join('');
   }
   function reviewPage() {
     const due=cards.filter(c=>state.reviews[c.id]&&new Date(state.reviews[c.id].dueAt)<=new Date()).sort((a,b)=>new Date(state.reviews[a.id].dueAt)-new Date(state.reviews[b.id].dueAt));
-    const todayCount=L.reviewedToday(state),c=todayCount<5+reviewExtra?due[0]:null,errors=state.attempts.filter(a=>!a.correct).slice(-10).reverse();
+    const hidden=hiddenAttempts(),todayCount=L.reviewedToday(state),c=todayCount<5+reviewExtra?due[0]:null,errors=state.attempts.filter(a=>!a.correct&&!hidden.has(a.id)).slice(-10).reverse();
     if(!c&&due.length)return pageHeading('Повторение','Порция на сегодня выполнена','Сегодня повторено '+todayCount+' карточек. Остальные '+due.length+' можно перенести на другой день.')+'<div class="actions"><a class="button" href="#week">Вернуться к плану недели</a><button data-action="more-reviews" class="secondary">Ещё пять по желанию</button></div>';
     return pageHeading('Ошибки и повторение','Вспомните до показа ответа','Начальная схема — 1 / 3 / 7 / 14 / 30 дней. После ошибки или подсказки возвращаемся к одному дню; это удобное правило, не персонально оптимальный алгоритм.')+
       '<p>Сегодня повторено: '+todayCount+' карточек. Базовая порция — пять.</p>'+
@@ -240,7 +293,7 @@
     try { $('#main').innerHTML=(views[name]||today)();bindForms(); }
     catch(error) { console.error(error);$('#main').innerHTML='<h1>Не удалось открыть раздел</h1><p>'+esc(error.message)+'</p><button data-action="export">Скачать сохранённые данные</button>'; }
     $('#main').focus({preventScroll:true});window.scrollTo(0,0);
-    if($('#timer')) { const tick=()=>{const s=state.sessions.quiz,left=C.remainingSeconds(s);if($('#timer'))$('#timer').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');if(left===0){s.finished=true;persist();render();}};tick();timer=setInterval(tick,1000); }
+    if($('#timer')) { const tick=()=>{const s=state.sessions.quiz,left=C.remainingSeconds(s);if($('#timer'))$('#timer').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');if(left===0){finishSession(s);persist();render();}};tick();timer=setInterval(tick,1000); }
   }
   function download(name,content,type='application/json') {
     const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -269,12 +322,12 @@
   function saveQuizDraft(event) { const s=state.sessions.quiz,q=sessionQuestion(s);s.draftAnswers[q.id]=getAnswer(event.currentTarget,q);s.confidence[q.id]=Number(new FormData(event.currentTarget).get('confidence')||0);persist(); }
   function submitAnswer(event) {
     event.preventDefault();const s=state.sessions.quiz,q=sessionQuestion(s),answer=getAnswer(event.target,q),confidence=Number(new FormData(event.target).get('confidence'));
-    if(s.finished||(s.deadline&&C.remainingSeconds(s)===0)){s.finished=true;persist();render();return;}
+    if(s.finished||(s.deadline&&C.remainingSeconds(s)===0)){finishSession(s);persist();render();return;}
     if(s.responseIds[s.index])return;
     if((Array.isArray(answer)&&(!answer.length||answer.includes(-1)))||answer===''){ $('#answerError').textContent='Сначала дайте ответ.';return; }
-    const a={id:uid(),questionId:q.id,questionVersion:q.version,questionSnapshot:structuredClone(q),answer,correct:C.grade(q,answer),confidence,priorExposure:!!s.previouslySeen?.[q.id],assisted:!!s.assisted[q.id]||!!state.exposures.find(x=>x.id===q.scenarioFamilyId)?.helpAt,answeredAt:now(),elapsedSeconds:Math.min(86400,Math.max(0,Math.round((Date.now()-new Date(s.started[q.id]).getTime())/1000)))};
+    const a={id:uid(),sessionId:s.id,questionId:q.id,questionVersion:q.version,questionSnapshot:structuredClone(q),answer,correct:C.grade(q,answer),confidence,priorExposure:!!s.previouslySeen?.[q.id],assisted:!!s.assisted[q.id]||!!state.exposures.find(x=>x.id===q.scenarioFamilyId)?.helpAt,answeredAt:now(),elapsedSeconds:Math.min(86400,Math.max(0,Math.round((Date.now()-new Date(s.started[q.id]).getTime())/1000)))};
     state.attempts.push(a);s.responseIds[s.index]=a.id;
-    if(!a.correct) cards.filter(c=>c.lessonId===q.lessonId).forEach(c=>state.reviews[c.id]=C.nextReview(state.reviews[c.id],false,confidence,false));
+    if(!deferred(s))scheduleMistake(a);
     if(persist())render();
   }
   async function previewImport(event) {
@@ -309,13 +362,26 @@
     try {
       if(action==='mode'){state.settings.mode=b.dataset.mode;persist();render();if(b.dataset.mode==='intensive')notice('Перед интенсивом сверьте ECO и правила на сайте PMI. Дата проверки сохранённых правил: '+config.checkedAt+'.');}
       if(action==='start-practice')startPractice(id);
+      if(action==='start-case')startPractice(id,'case');
       if(action==='resume-saved'){const saved=state.sessions.saved?.[id];if(saved){parkSession();state.sessions.quiz=saved;delete state.sessions.saved[id];persist();location.hash='#practice?session=active';}}
       if(action==='timed')startPractice(null,'timed');
-      if(action==='next-question'){const s=state.sessions.quiz;s.index++;if(s.index>=s.questionIds.length)s.finished=true;persist();render();}
+      if(action==='next-question'){const s=state.sessions.quiz;s.index++;if(s.index>=s.questionIds.length)finishSession(s);persist();render();}
       if(action==='complete')completeLesson(id);
+      if(action==='complete-lab'){
+        const l=getLesson(id),key=S.labKey(l),f=work(id).fields;
+        if(l.lab.prompts.some((_,i)=>(f[key+'answer-'+i]||'').trim().length<20)||l.lab.rubric.some((_,i)=>f[key+'criterion-'+i]!=='yes')){$('#labFeedback').textContent='Запишите три обоснованных ответа и проверьте каждый критерий. Если нужна доработка, черновик уже сохранён.';return;}
+        f[key+'done']=now();if(persist()){render();toast('Самопроверка практикума сохранена.');}
+      }
+      if(action==='export-lab'){
+        const l=getLesson(id),key=S.labKey(l),f=work(id).fields;
+        const table=l.lab.table,cell=v=>String(v).replace(/\|/g,'\\|').replace(/\n/g,' '),row=values=>'| '+values.map(cell).join(' | ')+' |';
+        const data=table.caption+'\n\n'+row(table.columns)+'\n'+row(table.columns.map(()=>'---'))+'\n'+table.rows.map(row).join('\n');
+        download(id+'-lab-v'+l.version+'.md','# '+l.lab.title+'\n\n'+l.lab.context+'\n\n'+data+'\n\n'+l.lab.prompts.map((p,i)=>'## '+p+'\n'+(f[key+'answer-'+i]||'')).join('\n\n')+'\n\n## Самопроверка\n'+l.lab.rubric.map((r,i)=>'- '+r+': '+(f[key+'criterion-'+i]==='yes'?'есть доказательство':'нужна доработка')).join('\n'),'text/markdown;charset=utf-8');
+      }
       if(action==='complete-week'){
         const l=getLesson(id),task=L.week(l,state).items.find(t=>t.id===b.dataset.task),f=work(id).fields;
         if(task.id==='lesson'&&l.recall.prompts.some((_,i)=>(f['recall-'+i]||'').trim().length<10)){$('#weekFeedback').textContent='Запишите три ответа на шаге урока «Вспомнить». Полное завершение урока для этого блока не требуется.';return;}
+        if(task.id==='challenge'&&l.lab&&!f[S.labKey(l)+'done']){$('#weekFeedback').textContent='Завершите практикум с данными и его самопроверку по ссылке выше. Старые результаты сохранены отдельно.';return;}
         if((f[task.key+'note']||'').trim().length<30||f[task.key+'check']!=='yes'){$('#weekFeedback').textContent='Запишите результат хотя бы одним содержательным предложением и выполните самопроверку.';return;}
         f[task.key+'-done']=now();if(persist()){render();toast('Шаг недели сохранён.');}
       }
@@ -357,7 +423,7 @@
       notice(loaded.notice);
       const packs=await Promise.all(config.packs.map(async path=>{const r=await fetch(path);if(!r.ok)throw Error('Не удалось загрузить '+path);const pack=await r.json();if(pack.schemaVersion!==2||!Array.isArray(pack.lessons))throw Error('Неподдерживаемый учебный пакет');return pack;}));
       lessons=packs.flatMap(pack=>pack.lessons).sort((a,b)=>a.week-b.week);
-      questions=lessons.flatMap(l=>l.questions.map(q=>({...q,lessonId:l.id})));
+      questions=S.questions(lessons);
       cards=lessons.flatMap(l=>l.cards.map(c=>({...c,lessonId:l.id})));
       $('#menuBtn').onclick=()=>{$('#nav').classList.toggle('open');$('#menuBtn').setAttribute('aria-expanded',String($('#nav').classList.contains('open')));};
       window.addEventListener('hashchange',render);persist();render();installOffline();

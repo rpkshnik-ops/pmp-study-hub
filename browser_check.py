@@ -43,6 +43,7 @@ def session_question(page, source):
     assert session['questionIds'][session['index']]==question_id
     question=session['questionSnapshots'][question_id]
     assert question['id']==question_id
+    page.get_by_role('heading',name=question['prompt'],exact=True).wait_for()
     return question
 
 def answer(page,source,correct=True):
@@ -155,6 +156,7 @@ def run():
         l03=next(l for l in CONTENT if l['id']=='L03')
         case_questions=[q for q in l03['questions'] if q.get('caseId')]
         page.goto(url+'/#practice');page.locator('[data-action=start-case][data-id=L03]').click()
+        page.locator('.case-context .data-table').wait_for()
         case_state=get_state(page)['sessions']['quiz']
         assert case_state['kind']=='case' and case_state['questionIds']==[q['id'] for q in case_questions]
         assert page.locator('.case-context .data-table').count()==1
